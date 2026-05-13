@@ -576,7 +576,7 @@
     const VIEWS = [
       { key: 'var_12_meses', label: 'Interanual', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%', isVar: true },
       { key: 'var_mensual',  label: 'Mensual',    fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', isVar: true },
-      { key: 'indice',       label: 'Índice',     fmt: v => v.toFixed(1), yFmt: v => v.toFixed(0), isVar: false },
+      { key: 'var_acumulada', label: 'Acumulada',   fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%', isVar: true },
     ];
 
     const RANGES = [
@@ -1012,11 +1012,19 @@
         } else {
           analysis = 'Datos no disponibles para este período.';
         }
-      } else {
-        const ippIdx = getVal(allSeries.ipp, fecha, 'indice');
-        analysis = ippIdx != null
-          ? `El índice base 2016=100 muestra cuánto han cambiado los precios desde el año de referencia. Un valor de <span class="delta-tag dt-blue">${ippIdx.toFixed(0)}</span> implica un aumento acumulado de <strong>${(ippIdx - 100).toFixed(0)}%</strong> desde 2016 en precios al productor.`
-          : 'Seleccione un punto del gráfico para ver el análisis.';
+      } else if (view.key === 'var_acumulada') {
+        const ippAcum = getVal(allSeries.ipp, fecha, 'var_acumulada');
+        const ipmAcum = getVal(allSeries.ipm, fecha, 'var_acumulada');
+        if (ippAcum != null && ipmAcum != null) {
+          const maxA = Math.max(ippAcum, ipmAcum);
+          analysis = maxA > 10
+            ? `<strong>Acumulado elevado para lo que va del año.</strong> IPP en <span class="delta-tag dt-blue">${fpct(ippAcum)}</span> e IPM en <span class="delta-tag dt-amber">${fpct(ipmAcum)}</span> — a este ritmo, la inflación anual en la cadena productiva será significativa.`
+            : maxA > 3
+            ? `<strong>Acumulado moderado.</strong> IPP <span class="delta-tag dt-blue">${fpct(ippAcum)}</span> e IPM <span class="delta-tag dt-amber">${fpct(ipmAcum)}</span> desde enero — las presiones se van sumando a lo largo del año.`
+            : `Variación acumulada contenida: IPP en ${fpct(ippAcum)} e IPM en ${fpct(ipmAcum)} desde enero. Presiones limitadas en lo que va del año.`;
+        } else {
+          analysis = 'Seleccione un punto del gráfico para ver el análisis.';
+        }
       }
 
       document.getElementById('panel-body').innerHTML = blocks.join('') +

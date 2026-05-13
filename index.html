@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPP e IPM — Bolivia · Populi</title>
+  <meta name="description" content="Dashboard de Índice de Precios Productor (IPP) e Índice de Precios al Por Mayor (IPM) de Bolivia. Datos abiertos del INE, base 2016=100.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    /* ── Variables — Tema Claro ─────────────────────────────────── */
+    :root {
+      --populi:      #8B1A1A;
+      --populi-dark: #6B0300;
+      --populi-light:#C00000;
+      --cream:       #F5EFE0;
+      --navy:        #0D1B2A;
+      --navy-light:  #1A2940;
+      --slate:       #475569;
+      --slate-light: #64748B;
+
+      --bg:      #EEF1F5;
+      --card:    #FFFFFF;
+      --card2:   #F7F9FB;
+      --border:  #DDE3EA;
+      --border2: #EEF1F5;
+      --text:    #0D1B2A;
+      --text2:   #364555;
+      --muted:   #6B7A8D;
+      --muted2:  #9AACBA;
+
+      --ct-ipp:  #2563EB;
+      --ct-ipm:  #D97706;
+      --ct-nac:  #0D9488;
+      --ct-imp:  #C71E1D;
+
+      --shadow:    0 1px 3px rgba(0,18,25,.05), 0 4px 18px rgba(0,18,25,.06);
+      --shadow-xs: 0 1px 2px rgba(0,18,25,.06);
+      --radius:    13px;
+      --transition:.18s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg:#050505;--card:#101010;--card2:#161616;--border:#222;--border2:#181818;
+      --text:#E8E8E8;--text2:#A0A0A0;--muted:#5A5A5A;--muted2:#303030;--cream:#1A2940;
+      --shadow:0 2px 10px rgba(0,0,0,.6),0 6px 28px rgba(0,0,0,.5);
+      --shadow-xs:0 1px 4px rgba(0,0,0,.5);
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;overflow-x:hidden}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);overflow-x:hidden}
+    a{color:var(--ct-nac);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* ── Navbar ─────────────────────────────────────────────────── */
+    .navbar{background:linear-gradient(180deg,#CE2020 0%,#A81414 100%);position:sticky;top:0;z-index:100;border-top:2px solid rgba(255,255,255,.15)}
+    [data-theme="dark"] .navbar{background:linear-gradient(160deg,#1A0606,#0A0202);border-top-color:rgba(199,30,29,.2);box-shadow:0 1px 0 rgba(199,30,29,.12)}
+    .navbar-inner{max-width:1320px;margin:auto;padding:0 24px;height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+    .nav-left{display:flex;align-items:center;gap:10px}
+    .logo-p{fill:rgba(255,255,255,.95)}
+    .logo-opuli{fill:rgba(255,255,255,.78)}
+    [data-theme="dark"] .logo-p{fill:rgba(199,30,29,.9)}
+    [data-theme="dark"] .logo-opuli{fill:rgba(245,239,224,.85)}
+    .nav-divider{width:1px;height:18px;background:rgba(255,255,255,.16)}
+    [data-theme="dark"] .nav-divider{background:rgba(255,255,255,.08)}
+    .brand-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.45);letter-spacing:.2px;white-space:nowrap}
+    [data-theme="dark"] .brand-sub{color:rgba(255,255,255,.25)}
+    .nav-center{text-align:center;font-size:13px;font-weight:600;letter-spacing:-.1px;color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    [data-theme="dark"] .nav-center{color:rgba(255,255,255,.7)}
+    .nav-right{display:flex;align-items:center;justify-content:flex-end;gap:12px}
+    .nav-meta{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;display:flex;align-items:center;gap:5px}
+    .nav-meta b{color:rgba(255,255,255,.85);font-weight:600}
+    .live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ADE80;animation:livepulse 2.4s ease-in-out infinite}
+    @keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
+    .theme-btn{width:34px;height:34px;border-radius:8px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.16);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .14s}
+    .theme-btn:hover{background:rgba(0,0,0,.32)}
+    .theme-btn svg{width:15px;height:15px;fill:rgba(255,255,255,.85)}
+    [data-theme="dark"] .theme-btn{background:rgba(199,30,29,.1);border-color:rgba(199,30,29,.2)}
+
+    /* ── Hero ──────────────────────────────────────────────────── */
+    .hero{background:linear-gradient(180deg,#A81414 0%,#6A0C0C 40%,#1A0404 80%,#000 100%);padding:40px 24px 44px;text-align:center;position:relative;overflow:hidden}
+    [data-theme="dark"] .hero{background:linear-gradient(180deg,#0A0202 0%,#040101 50%,#000 100%)}
+    .hero-inner{max-width:700px;margin:auto;position:relative;z-index:1}
+    .hero-watermark{position:absolute;right:-10px;bottom:-20px;font-family:'JetBrains Mono',monospace;font-size:clamp(90px,14vw,180px);font-weight:500;letter-spacing:-6px;color:rgba(255,255,255,.05);line-height:1;pointer-events:none;user-select:none;z-index:0}
+    [data-theme="dark"] .hero-watermark{color:rgba(255,255,255,.022)}
+    .hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,3vw,30px);font-weight:800;color:rgba(255,255,255,.95);letter-spacing:-.5px;line-height:1.15;margin-bottom:10px}
+    .hero h1 em{color:rgba(255,255,255,.45);font-style:normal;font-weight:400}
+    .hero-desc{font-size:13.5px;color:rgba(255,255,255,.42);line-height:1.7}
+
+    /* ── Info Strip ────────────────────────────────────────────── */
+    .info-strip{background:var(--card2);border-bottom:1px solid var(--border);padding:12px 28px;transition:background var(--transition)}
+    .info-strip-inner{max-width:1320px;margin:auto;display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--muted)}
+    .info-strip-inner b{color:var(--text2);font-weight:600}
+    .info-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+
+    /* ── Alert Banner ─────────────────────────────────────────── */
+    .alert-banner{display:none;border-bottom:1px solid var(--border);padding:13px 24px;background:linear-gradient(90deg,rgba(199,30,29,.06),rgba(199,30,29,.015))}
+    .alert-banner.visible{display:block}
+    [data-theme="dark"] .alert-banner{background:linear-gradient(90deg,rgba(199,30,29,.12),rgba(199,30,29,.02))}
+    .alert-inner{max-width:1320px;margin:auto;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);line-height:1.55}
+    .alert-inner b{color:var(--ct-imp);font-family:'JetBrains Mono',monospace}
+
+    /* ── Container ─────────────────────────────────────────────── */
+    .container{max-width:1320px;margin:auto;padding:32px 24px 60px}
+    .section{margin-bottom:48px}
+    .section-header{margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+    .section-num{font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--ct-ipp);border:1.5px solid rgba(37,99,235,.25);padding:2px 7px;border-radius:20px;margin-top:3px;flex-shrink:0}
+    .section-titles h2{font-size:15.5px;font-weight:700;color:var(--text);letter-spacing:-.15px}
+    .section-titles p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+    /* ── KPI Grid ──────────────────────────────────────────────── */
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:1080px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}}
+    .kpi-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px 14px;border-left:3px solid transparent;display:flex;flex-direction:column;gap:3px;transition:background var(--transition),box-shadow var(--transition)}
+    .kpi-card.ipp{border-left-color:var(--ct-ipp)}
+    .kpi-card.ipm{border-left-color:var(--ct-ipm)}
+    .kpi-card.nac{border-left-color:var(--ct-nac)}
+    .kpi-card.imp{border-left-color:var(--ct-imp)}
+    .kpi-card.brecha{border-left-color:#8B5CF6}
+    .kpi-card.grupo{border-left-color:#EC4899}
+    .kpi-label{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+    .kpi-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--text);line-height:1.1;margin-top:5px;letter-spacing:-.5px}
+    .kpi-sub{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+    .kpi-delta{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:3px}
+    .kpi-delta.up{color:#C71E1D}
+    .kpi-delta.down{color:#0D9488}
+    .kpi-delta.flat{color:var(--muted)}
+
+    /* ── Context Stats ─────────────────────────────────────────── */
+    .ctx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:32px}
+    .ctx-stat{background:var(--card);border-radius:10px;box-shadow:var(--shadow-xs);padding:14px 16px;border-left:3px solid var(--border);transition:background var(--transition)}
+    .ctx-stat.warn{border-left-color:var(--ct-imp)}
+    .ctx-stat.ok{border-left-color:var(--ct-nac)}
+    .ctx-stat.info{border-left-color:var(--ct-ipp)}
+    .ctx-stat.alert{border-left-color:#8B5CF6}
+    .ctx-label{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .ctx-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--text);line-height:1.2}
+    .ctx-desc{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+
+    /* ── Chart Cards ───────────────────────────────────────────── */
+    .chart-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;transition:background var(--transition)}
+    .chart-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+    .chart-card-meta{display:flex;flex-direction:column;gap:3px}
+    .chart-card-title{font-size:12.5px;font-weight:700;color:var(--text)}
+    .chart-card-sub{font-size:11px;color:var(--muted)}
+    .chart{width:100%;height:400px}
+    .chart-tall{height:440px}
+    .chart-med{height:320px}
+    @media(max-width:700px){.chart{height:260px}.chart-tall{height:300px}.chart-med{height:240px}}
+
+    /* ── Pedagogy Notes ────────────────────────────────────────── */
+    .pedagogy{background:var(--cream);border-radius:10px;padding:14px 16px;margin-top:14px;border-left:3px solid var(--ct-ipp)}
+    [data-theme="dark"] .pedagogy{background:var(--navy-light,#1A2940)}
+    .pedagogy-title{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ct-ipp);margin-bottom:6px}
+    [data-theme="dark"] .pedagogy-title{color:#60A5FA}
+    .pedagogy p{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:4px}
+    .pedagogy p:last-child{margin-bottom:0}
+    .pedagogy strong{color:var(--text2)}
+    [data-theme="dark"] .pedagogy strong{color:#E2E8F0}
+    .pedagogy .mono{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.92em}
+
+    /* ── Controls ──────────────────────────────────────────────── */
+    .controls-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .toggle-pill{display:flex;align-items:center;gap:5px;padding:4px 12px;border:1.5px solid;border-radius:8px;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;transition:all .18s}
+    .toggle-pill:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+    .toggle-pill .line-prev{width:14px;height:0;border-top:2.5px solid;border-radius:1px}
+    .toggle-pill .line-prev.dashed{border-top-style:dashed}
+    .range-btns,.view-btns{display:flex;gap:4px}
+    .rbtn,.vbtn{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .14s}
+    .rbtn:hover{border-color:var(--ct-ipp);color:var(--ct-ipp);background:rgba(37,99,235,.06)}
+    .rbtn.active{background:var(--ct-ipp);border-color:var(--ct-ipp);color:#fff}
+    .vbtn:hover{border-color:var(--ct-ipm);color:var(--ct-ipm)}
+    .vbtn.active{background:var(--ct-ipm);border-color:var(--ct-ipm);color:#fff}
+
+    .chart-source{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:10.5px;color:var(--muted)}
+    .chart-source a{color:var(--populi);font-weight:600}
+
+    .chart-hint{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:5px;margin-top:8px}
+    .chart-hint svg{width:13px;height:13px;fill:var(--muted2);flex-shrink:0}
+
+    /* ── Dual Grid ─────────────────────────────────────────────── */
+    .dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:900px){.dual-grid{grid-template-columns:1fr}}
+
+    /* ── Data Table ────────────────────────────────────────────── */
+    .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:800px}
+    thead tr{background:var(--navy)}
+    [data-theme="dark"] thead tr{background:#080808}
+    thead th{padding:11px 14px;text-align:left;font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap}
+    thead th:not(:first-child){text-align:right}
+    tbody tr{border-bottom:1px solid var(--border2);transition:background .1s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--card2)}
+    tbody td{padding:10px 14px;font-size:12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-weight:500}
+    tbody td:first-child{font-family:'Inter',sans-serif;font-weight:600;color:var(--text2)}
+    tbody td:not(:first-child){text-align:right}
+    .td-up{color:#C71E1D} .td-down{color:#0D9488}
+
+    /* ── Methodology ───────────────────────────────────────────── */
+    .method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .method-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-xs);padding:20px;border-left:3px solid var(--ct-ipp);transition:background var(--transition)}
+    .method-card.accent-ipm{border-left-color:var(--ct-ipm)}
+    .method-card.accent-nac{border-left-color:var(--ct-nac)}
+    .method-card.accent-imp{border-left-color:var(--ct-imp)}
+    .method-card.accent-populi{border-left-color:var(--populi)}
+    .method-card h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .method-card p{font-size:12.5px;color:var(--muted);line-height:1.65}
+    .method-card p strong{color:var(--text2)}
+    .method-card .mono{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.92em}
+
+    /* ── Footer ────────────────────────────────────────────────── */
+    footer{background:#060D16;color:#3D5568;border-top:3px solid var(--populi);padding:24px 28px}
+    .footer-inner{max-width:1320px;margin:auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;font-size:11.5px;line-height:1.6}
+    .footer-sources{color:#3D5568} .footer-sources a{color:#52788C}
+    .footer-brand{color:#3D5568} .footer-brand a{color:#94D2BD;font-weight:600}
+
+    /* ── Loader ─────────────────────────────────────────────────── */
+    .loader{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:12px}
+    .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--populi);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loader-text{font-size:13px;color:var(--muted)}
+
+    /* ── Mobile ─────────────────────────────────────────────────── */
+    @media(max-width:768px){
+      .brand-sub,.nav-divider{display:none}
+      .navbar-inner{padding:0 16px;height:50px}
+      .nav-center{font-size:11px}
+      .ctx-grid{grid-template-columns:repeat(2,1fr)}
+      .method-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:520px){
+      .navbar-inner{display:flex;justify-content:space-between;height:48px;padding:0 14px}
+      .nav-left svg{height:26px}
+      .nav-center{display:none}.nav-meta{font-size:10px}
+      .alert-banner{padding:11px 14px}
+      .alert-inner{font-size:11.5px}
+      .hero{padding:28px 16px 32px}.hero h1{font-size:20px}
+      .hero-watermark{font-size:80px;right:5px;bottom:-10px}
+      .info-strip{padding:12px 16px}.info-strip-inner{flex-direction:column;font-size:11.5px;line-height:1.7}
+      .container{padding:20px 12px 40px}.section{margin-bottom:28px}
+      .section-titles h2{font-size:14px}
+      .chart-card{padding:12px 8px 10px;border-radius:10px}
+      .chart-card-top{flex-direction:column;gap:10px}
+      .controls-row{gap:5px}
+      .toggle-pill{padding:6px 10px;font-size:10px;min-height:36px}
+      .toggle-pill .line-prev{width:10px}
+      .rbtn,.vbtn{padding:6px 10px;font-size:10px;min-height:36px}
+      .view-btns,.range-btns{flex-wrap:wrap}
+      .kpi-grid{grid-template-columns:1fr 1fr !important;gap:8px}
+      .kpi-value{font-size:20px}.kpi-card{padding:12px 12px 10px}
+      .kpi-label{font-size:8.5px;letter-spacing:.8px}
+      .kpi-sub{font-size:9.5px}
+      .kpi-delta{font-size:10px}
+      .ctx-grid{grid-template-columns:1fr !important;gap:8px}
+      .ctx-value{font-size:18px}
+      .ctx-desc{font-size:10px}
+      .pedagogy{padding:12px 14px;margin-top:10px}
+      .pedagogy p{font-size:11.5px}
+      .chart-source{flex-direction:column;gap:4px;align-items:flex-start;font-size:9.5px}
+      .chart-hint{font-size:10px}
+      .dual-grid{gap:12px}
+      .table-wrap{border-radius:10px;position:relative;-webkit-overflow-scrolling:touch}
+      .table-wrap::after{content:'← Deslice →';position:absolute;top:0;right:0;background:linear-gradient(90deg,transparent,var(--card) 40%);padding:12px 14px 12px 30px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);pointer-events:none}
+      table{min-width:640px}
+      thead th{padding:9px 10px;font-size:8.5px}
+      tbody td{padding:8px 10px;font-size:11px}
+      .method-grid{grid-template-columns:1fr !important}
+      .method-card{padding:16px}
+      .method-card p{font-size:12px}
+      .section-header{gap:8px}
+      .section-num{font-size:8.5px;padding:2px 6px}
+      footer{padding:18px 14px}.footer-inner{flex-direction:column;gap:8px;font-size:10.5px}
+    }
+    @media(max-width:360px){
+      .kpi-grid{grid-template-columns:1fr !important}
+      .toggle-pill{padding:5px 8px;font-size:9.5px}
+      .chart{height:220px !important}.chart-tall{height:260px !important}.chart-med{height:200px !important}
+      .hero h1{font-size:18px}
+      .hero-desc{font-size:12px}
+      .nav-left svg{height:22px}
+      .ctx-stat{padding:10px 12px}
+      .method-card{padding:14px}
+      .method-card p{font-size:11.5px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-left">
+      <svg viewBox="0 0 310 130" style="height:32px;width:auto;flex-shrink:0" aria-hidden="true">
+        <text x="6" y="112" font-family="'Playfair Display',Georgia,serif" font-size="145" font-weight="700" class="logo-p">P</text>
+        <text x="92" y="87" font-family="'Playfair Display',Georgia,serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" class="logo-opuli">opuli</text>
+      </svg>
+      <span class="nav-divider"></span>
+      <span class="brand-sub">Centro de Estudios de Políticas Públicas para la Libertad</span>
+    </div>
+    <div class="nav-center">Precios Productor y Mayorista · Bolivia</div>
+    <div class="nav-right">
+      <div class="nav-meta" id="nav-updated"></div>
+      <button class="theme-btn" id="theme-toggle" title="Modo oscuro/claro">
+        <svg id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="4.5" fill="#fff"/><g stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-inner">
+    <h1>Índice de Precios Productor <em>&</em> Precios al Por Mayor</h1>
+    <p class="hero-desc">Seguimiento mensual de los eslabones iniciales de la cadena de precios en Bolivia. IPP (productor) e IPM (mayorista) anticipan las presiones que eventualmente se trasladan al consumidor. Base 2016=100 · Fuente INE.</p>
+  </div>
+  <span class="hero-watermark">IPP</span>
+</header>
+
+<!-- Info Strip -->
+<div class="info-strip">
+  <div class="info-strip-inner">
+    <span class="info-icon">ℹ</span>
+    <span>
+      <b>IPP:</b> precios a la salida de producción (fábrica, campo, mina) — primer eslabón. &nbsp;|&nbsp;
+      <b>IPM:</b> precios en el canal mayorista (productor→minorista), distingue bienes <b>nacionales</b> e <b>importados</b>. &nbsp;|&nbsp;
+      <b>Cadena:</b> IPP → IPM → IPC — las presiones nacen en producción y se trasladan al consumidor con rezago de semanas.
+    </span>
+  </div>
+</div>
+
+<!-- Alert Banner -->
+<div class="alert-banner" id="alert-banner">
+  <div class="alert-inner">
+    <span style="font-size:15px;flex-shrink:0">⚠</span>
+    <span id="alert-text"></span>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="app">
+  <div class="loader" id="loader"><div class="spinner"></div><span class="loader-text">Cargando datos del INE...</span></div>
+</div>
+
+<script>
+(function(){
+  const BASE='https://centro-de-estudios-populi.github.io/populi-precios-productor/data/';
+  const C={ipp:'#2563EB',ipm:'#D97706',nac:'#0D9488',imp:'#C71E1D'};
+  const GRP_COLORS=['#2563EB','#D97706','#0D9488','#C71E1D','#8B5CF6','#EC4899'];
+
+  function isDark(){return document.documentElement.dataset.theme==='dark'}
+  function fpct(v){return(v>=0?'+':'')+v.toFixed(1)+'%'}
+  function fpct2(v){return(v>=0?'+':'')+v.toFixed(2)+'%'}
+  function fdate(f){const[y,m]=f.split('-');const mn=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return mn[+m-1]+' '+y}
+  function fdateL(f){const[y,m]=f.split('-');const mn=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];return mn[+m-1]+' de '+y}
+
+  // Theme
+  const themeBtn=document.getElementById('theme-toggle');
+  const sunI=document.getElementById('icon-sun'),moonI=document.getElementById('icon-moon');
+  function syncIcons(){const dk=isDark();sunI.style.display=dk?'block':'none';moonI.style.display=dk?'none':'block'}
+  syncIcons();
+  themeBtn.addEventListener('click',()=>{document.documentElement.dataset.theme=isDark()?'light':'dark';syncIcons()});
+  window.addEventListener('message',e=>{if(e.data&&e.data.theme){document.documentElement.dataset.theme=e.data.theme;syncIcons()}});
+
+  async function init(){
+    let ipp,ipmGen,ipmOrigen,ippGrupos,comparativo,meta;
+    try{
+      [ipp,ipmGen,ipmOrigen,ippGrupos,comparativo,meta]=await Promise.all([
+        fetch(BASE+'ipp_general.json').then(r=>r.json()),
+        fetch(BASE+'ipm_general.json').then(r=>r.json()),
+        fetch(BASE+'ipm_origen.json').then(r=>r.json()),
+        fetch(BASE+'ipp_grupos.json').then(r=>r.json()),
+        fetch(BASE+'comparativo.json').then(r=>r.json()),
+        fetch(BASE+'metadata.json').then(r=>r.json()),
+      ]);
+    }catch(e){document.getElementById('loader').innerHTML='<span class="loader-text" style="color:var(--ct-imp)">Error al cargar datos.</span>';return}
+
+    const origenMap={};ipmOrigen.forEach(c=>{origenMap[c.categoria]=c.series});
+    const ipmNac=origenMap['ORIGEN NACIONAL']||[];
+    const ipmImp=origenMap['ORIGEN IMPORTADOS']||[];
+
+    // Nav date
+    if(meta.actualizado){
+      const d=new Date(meta.actualizado);
+      document.getElementById('nav-updated').innerHTML=`<span class="live-dot"></span> Act. <b>${d.toLocaleDateString('es-BO',{day:'numeric',month:'short',year:'numeric'})}</b>`;
+    }
+
+    // Key data
+    const lastIPP=ipp[ipp.length-1],prevIPP=ipp[ipp.length-2];
+    const lastIPM=ipmGen[ipmGen.length-1],prevIPM=ipmGen[ipmGen.length-2];
+    const lastNac=ipmNac[ipmNac.length-1],lastImp=ipmImp[ipmImp.length-1];
+    const brechaIPPIPM=Math.abs(lastIPP.var_12_meses-(lastIPM.var_12_meses||0));
+    const canalImpPremium=lastImp.var_12_meses-lastNac.var_12_meses;
+
+    // Top grupo
+    const gruposRanked=ippGrupos.map(g=>{const l=g.series[g.series.length-1];return{name:g.grupo,pond:g.ponderacion,v12:l.var_12_meses,idx:l.indice}}).sort((a,b)=>b.v12-a.v12);
+    const topGrupo=gruposRanked[0];
+
+    // Alert banner
+    const maxVar=Math.max(lastIPP.var_12_meses,lastIPM.var_12_meses);
+    if(maxVar>15){
+      document.getElementById('alert-text').innerHTML=`<strong>Alerta:</strong> La variación interanual del ${lastIPP.var_12_meses>lastIPM.var_12_meses?'IPP':'IPM'} alcanza <b>${fpct(maxVar)}</b> — presiones inflacionarias severas en la cadena productiva. El grupo con mayor presión es <b>${topGrupo.name}</b> con <b>${fpct(topGrupo.v12)}</b>.`;
+      document.getElementById('alert-banner').classList.add('visible');
+    }
+
+    // Build
+    const app=document.getElementById('app');
+    app.innerHTML=`
+      <main class="container">
+
+        <!-- KPIs Row 1 -->
+        <div class="section" style="margin-bottom:16px">
+          <div class="section-header">
+            <span class="section-num">01</span>
+            <div class="section-titles">
+              <h2>Indicadores Clave</h2>
+              <p>Último dato disponible — ${fdateL(lastIPP.fecha)} (IPP) · ${fdateL(lastIPM.fecha)} (IPM)</p>
+            </div>
+          </div>
+          <div class="kpi-grid" id="kpis"></div>
+        </div>
+
+        <!-- Context Analysis -->
+        <div class="ctx-grid" id="ctx-analysis"></div>
+
+        <!-- S2: Comparativo -->
+        <div class="section" id="s-comp">
+          <div class="section-header">
+            <span class="section-num">02</span>
+            <div class="section-titles">
+              <h2>IPP vs IPM — Serie Histórica Comparativa</h2>
+              <p>4 índices en una vista. Active o desactive series con los botones de color. Pase el cursor para ver valores puntuales.</p>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-top">
+              <div class="controls-row" id="s2-toggles"></div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div class="view-btns" id="s2-views"></div>
+                <div class="range-btns" id="s2-ranges"></div>
+              </div>
+            </div>
+            <div class="chart chart-tall" id="chart-comp"></div>
+            <div class="chart-source">
+              <span>Fuente: <a href="https://www.ine.gob.bo" target="_blank">INE Bolivia</a> · Elaboración: <a href="https://populi.org.bo" target="_blank">POPULI</a></span>
+            </div>
+            <div class="chart-hint">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              Interactúe con el gráfico para explorar fechas específicas. Las líneas punteadas corresponden a los componentes del IPM.
+            </div>
+          </div>
+          <div class="pedagogy">
+            <div class="pedagogy-title">¿Cómo leer este gráfico?</div>
+            <p>Cada línea representa la <strong>variación interanual</strong> (cambio porcentual respecto al mismo mes del año anterior) de un índice. Cuando una línea está por encima de 0%, los precios están subiendo respecto al año anterior. Cuanto más alta la línea, más acelerada la inflación en esa etapa de la cadena.</p>
+            <p>Si el <strong>IPP</strong> (azul) sube antes que el <strong>IPM</strong> (ámbar), las presiones nacen en producción y se transmitirán al canal mayorista. Si el <strong>IPM Importado</strong> (rojo) se despega del <strong>Nacional</strong> (verde), el tipo de cambio paralelo está encareciendo los bienes importados — <strong>inflación importada</strong>.</p>
+          </div>
+        </div>
+
+        <!-- S3: Dual grid -->
+        <div class="section">
+          <div class="dual-grid">
+            <div>
+              <div class="section-header">
+                <span class="section-num">03</span>
+                <div class="section-titles">
+                  <h2>IPP por Grupo Productivo</h2>
+                  <p>Variación interanual y peso relativo en el índice general.</p>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart chart-med" id="chart-grupos"></div>
+                <div class="pedagogy" style="margin-top:10px">
+                  <div class="pedagogy-title">¿Qué significan las ponderaciones?</div>
+                  <p>Cada grupo tiene un <strong>peso</strong> en el índice general. Servicios (<span class="mono">${ippGrupos.find(g=>g.grupo==='Servicios')?.ponderacion}%</span>) e Industria Manufacturera (<span class="mono">${ippGrupos.find(g=>g.grupo==='Industria Manufacturera')?.ponderacion}%</span>) dominan el IPP. Un alza en estos sectores tiene más impacto que en Pesca (<span class="mono">${ippGrupos.find(g=>g.grupo==='Pesca')?.ponderacion}%</span>).</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="section-header">
+                <span class="section-num">04</span>
+                <div class="section-titles">
+                  <h2>IPM por Origen</h2>
+                  <p>Nacional vs. Importado — con desglose por subgrupos.</p>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart chart-med" id="chart-origen"></div>
+                <div class="pedagogy" style="margin-top:10px">
+                  <div class="pedagogy-title">¿Por qué importa el origen?</div>
+                  <p>Los bienes <strong>importados</strong> reflejan el tipo de cambio real (paralelo, no oficial). Cuando la brecha cambiaria crece, el componente importado del IPM sube más que el nacional — es <strong>inflación importada</strong> vía tipo de cambio. Hoy la diferencia es <span class="mono">${canalImpPremium.toFixed(1)} pp</span>.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- S4: Evolución Grupos -->
+        <div class="section" id="s-evol">
+          <div class="section-header">
+            <span class="section-num">05</span>
+            <div class="section-titles">
+              <h2>Evolución Histórica del IPP por Grupo</h2>
+              <p>Serie temporal de cada sector productivo. Identifique qué grupos lideran las presiones inflacionarias.</p>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-top">
+              <div class="chart-card-meta">
+                <span class="chart-card-title">Variación interanual — 6 grupos productivos</span>
+                <span class="chart-card-sub">Metodología Laspeyres, base 2016=100</span>
+              </div>
+              <div class="range-btns" id="s4-ranges"></div>
+            </div>
+            <div class="chart chart-tall" id="chart-evol"></div>
+            <div class="pedagogy">
+              <div class="pedagogy-title">Lectura de la evolución</div>
+              <p>Los grupos con <strong>alta ponderación</strong> (Servicios, Industria) determinan la tendencia general. Pero grupos con <strong>alta volatilidad</strong> (Pecuaria, Agrícolas) pueden generar shocks puntuales. Cuando <strong>todos los grupos suben simultáneamente</strong>, las presiones son generalizadas — no sectoriales — lo que indica un problema macroeconómico (monetario o cambiario).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- S5: Tabla -->
+        <div class="section" id="s-tabla">
+          <div class="section-header">
+            <span class="section-num">06</span>
+            <div class="section-titles">
+              <h2>Datos Históricos — Últimos 24 Meses</h2>
+              <p>Comparativo IPP e IPM con variaciones interanuales, mensuales y acumuladas.</p>
+            </div>
+          </div>
+          <div class="table-wrap" id="table-wrap"></div>
+        </div>
+
+        <!-- S6: Metodología -->
+        <div class="section" id="s-metodo">
+          <div class="section-header">
+            <span class="section-num">07</span>
+            <div class="section-titles">
+              <h2>Metodología, Fuentes y Conceptos Clave</h2>
+              <p>Todo lo que necesita saber para interpretar correctamente estos indicadores.</p>
+            </div>
+          </div>
+          <div class="method-grid" id="method-grid"></div>
+        </div>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span class="footer-sources">Datos: <a href="https://www.ine.gob.bo" target="_blank">INE Bolivia</a> · Notas metodológicas: <a href="https://www.ine.gob.bo/index.php/informacion-tecnica-ipp/" target="_blank">IPP</a> · <a href="https://www.ine.gob.bo/index.php/informacion-tecnica-ipm/" target="_blank">IPM</a></span>
+          <span class="footer-brand">Elaboración: <a href="https://populi.org.bo" target="_blank">Centro de Estudios POPULI</a> · Actualización automática vía GitHub Actions</span>
+        </div>
+      </footer>
+    `;
+
+    // ── KPIs ──────────────────────────────────────────────
+    const dCls=(a,b)=>a>b?'up':a<b?'down':'flat';
+    const dArr=c=>c==='up'?'▲':c==='down'?'▼':'—';
+    const kpis=[
+      {cls:'ipp',label:'IPP Interanual',val:lastIPP.var_12_meses,delta:lastIPP.var_12_meses-prevIPP.var_12_meses,sub:'Precios a la salida de producción'},
+      {cls:'ipm',label:'IPM General',val:lastIPM.var_12_meses,delta:lastIPM.var_12_meses-prevIPM.var_12_meses,sub:'Canal mayorista — nacional + importado'},
+      {cls:'nac',label:'IPM Nacional',val:lastNac.var_12_meses,sub:'Bienes de origen interno'},
+      {cls:'imp',label:'IPM Importado',val:lastImp.var_12_meses,sub:'Bienes importados — sensible al tipo de cambio'},
+      {cls:'ipp',label:'IPP Mensual',val:lastIPP.var_mensual,sub:`Cambio respecto a ${fdate(prevIPP.fecha)}`,isMensual:true},
+      {cls:'ipm',label:'IPM Mensual',val:lastIPM.var_mensual,sub:`Cambio respecto a ${fdate(prevIPM.fecha)}`,isMensual:true},
+      {cls:'brecha',label:'Brecha IPP–IPM',val:brechaIPPIPM,sub:lastIPP.var_12_meses>lastIPM.var_12_meses?'IPP lidera — presión nace en producción':'IPM lidera — distribución amplifica presión',isPP:true},
+      {cls:'grupo',label:'Grupo Más Inflacionario',val:topGrupo.v12,sub:`${topGrupo.name} (pond. ${topGrupo.pond}%)`,isGrupo:true},
+    ];
+    document.getElementById('kpis').innerHTML=kpis.map(k=>{
+      const dc=k.delta!=null?dCls(k.delta,0):'flat';
+      const valStr=k.isMensual?fpct2(k.val):k.isPP?(Math.abs(k.val).toFixed(1)+' pp'):fpct(k.val);
+      return `<div class="kpi-card ${k.cls}">
+        <div class="kpi-label">${k.label}</div>
+        <div class="kpi-value">${k.val!=null?valStr:'—'}</div>
+        ${k.delta!=null?`<div class="kpi-delta ${dc}">${dArr(dc)} ${Math.abs(k.delta).toFixed(1)} pp vs. mes anterior</div>`:''}
+        <div class="kpi-sub">${k.sub}</div>
+      </div>`;
+    }).join('');
+
+    // ── Context Analysis ──────────────────────────────────
+    const transmision=lastIPP.var_12_meses>lastIPM.var_12_meses?'Los productores enfrentan costos que aún no se trasladan completamente al canal mayorista — anticipa presiones futuras.':'El canal mayorista amplifica las presiones, posiblemente por costos de importación y distribución.';
+    const impAnalysis=canalImpPremium>5?'La brecha importado-nacional es muy elevada — el tipo de cambio paralelo encarece severamente los bienes importados.':canalImpPremium>0?'Los bienes importados registran mayor inflación que los nacionales, reflejando presiones cambiarias.':'Los bienes nacionales superan a los importados — las presiones son mayormente de origen interno.';
+
+    document.getElementById('ctx-analysis').innerHTML=`
+      <div class="ctx-stat ${maxVar>15?'warn':'ok'}">
+        <div class="ctx-label">Presión general</div>
+        <div class="ctx-value">${fpct(maxVar)}</div>
+        <div class="ctx-desc">${maxVar>20?'Presiones severas':'Presiones moderadas'} en la cadena productiva. ${maxVar>15?'Niveles que históricamente se trasladan al IPC.':'Dentro de rangos de transmisión limitada al consumidor.'}</div>
+      </div>
+      <div class="ctx-stat info">
+        <div class="ctx-label">Transmisión IPP → IPM</div>
+        <div class="ctx-value">${brechaIPPIPM.toFixed(1)} pp</div>
+        <div class="ctx-desc">${transmision}</div>
+      </div>
+      <div class="ctx-stat ${canalImpPremium>5?'warn':canalImpPremium>0?'alert':'ok'}">
+        <div class="ctx-label">Prima canal importado</div>
+        <div class="ctx-value">${canalImpPremium>=0?'+':''}${canalImpPremium.toFixed(1)} pp</div>
+        <div class="ctx-desc">${impAnalysis}</div>
+      </div>
+      <div class="ctx-stat info">
+        <div class="ctx-label">Concentración sectorial</div>
+        <div class="ctx-value">${topGrupo.name}</div>
+        <div class="ctx-desc">Lidera con ${fpct(topGrupo.v12)} interanual y ${topGrupo.pond}% de peso en el IPP. ${gruposRanked.filter(g=>g.v12>10).length>=4?'La presión es generalizada — todos los grupos suben.':'La presión está concentrada en pocos sectores.'}</div>
+      </div>
+    `;
+
+    // ── Chart Comparativo ─────────────────────────────────
+    const VIEWS=[
+      {key:'var_12_meses',label:'Interanual',fmt:v=>fpct(v),yFmt:v=>(v>=0?'+':'')+v.toFixed(0)+'%',isVar:true},
+      {key:'var_mensual',label:'Mensual',fmt:v=>fpct2(v),yFmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%',isVar:true},
+      {key:'var_acumulada',label:'Acumulada',fmt:v=>fpct(v),yFmt:v=>(v>=0?'+':'')+v.toFixed(0)+'%',isVar:true},
+    ];
+    const RANGES=[{l:'2A',m:24},{l:'5A',m:60},{l:'Todo',m:0}];
+    const SERIES=[
+      {key:'ipp',label:'IPP',color:C.ipp,dashed:false,data:ipp},
+      {key:'ipm',label:'IPM General',color:C.ipm,dashed:false,data:ipmGen},
+      {key:'nac',label:'IPM Nacional',color:C.nac,dashed:true,data:ipmNac},
+      {key:'imp',label:'IPM Importado',color:C.imp,dashed:true,data:ipmImp},
+    ];
+    let s2Active=new Set(SERIES.map(s=>s.key)),s2View=0,s2Range=2,chart2;
+
+    const s2Tog=document.getElementById('s2-toggles');
+    SERIES.forEach(s=>{
+      const btn=document.createElement('button');btn.className='toggle-pill';btn.dataset.key=s.key;
+      btn.innerHTML=`<span class="line-prev${s.dashed?' dashed':''}" style="border-color:#fff"></span>${s.label}`;
+      btn.addEventListener('click',()=>{if(s2Active.has(s.key)){if(s2Active.size===1)return;s2Active.delete(s.key)}else s2Active.add(s.key);syncS2();renderComp()});
+      s2Tog.appendChild(btn);
+    });
+    function syncS2(){s2Tog.querySelectorAll('.toggle-pill').forEach(b=>{const s=SERIES.find(x=>x.key===b.dataset.key);const on=s2Active.has(s.key);b.style.backgroundColor=on?s.color:'transparent';b.style.color=on?'#fff':s.color;b.style.borderColor=s.color;b.querySelector('.line-prev').style.borderColor=on?'#fff':s.color})}
+    syncS2();
+
+    const s2ViewEl=document.getElementById('s2-views');
+    VIEWS.forEach((v,i)=>{const b=document.createElement('button');b.className='vbtn'+(i===0?' active':'');b.textContent=v.label;b.addEventListener('click',()=>{s2View=i;s2ViewEl.querySelectorAll('.vbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderComp()});s2ViewEl.appendChild(b)});
+
+    const s2RangeEl=document.getElementById('s2-ranges');
+    RANGES.forEach((r,i)=>{const b=document.createElement('button');b.className='rbtn'+(i===2?' active':'');b.textContent=r.l;b.addEventListener('click',()=>{s2Range=i;s2RangeEl.querySelectorAll('.rbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderComp()});s2RangeEl.appendChild(b)});
+
+    function getDates(series,rangeIdx){
+      const m=RANGES[rangeIdx].m;const ds=new Set();
+      series.forEach(s=>{if(!s2Active.has(s.key))return;const a=m?s.data.slice(-m):s.data;a.forEach(r=>ds.add(r.fecha))});
+      return[...ds].sort();
+    }
+
+    function renderComp(){
+      if(!chart2)chart2=echarts.init(document.getElementById('chart-comp'));
+      const dk=isDark(),mob=window.innerWidth<520,view=VIEWS[s2View],dates=getDates(SERIES,s2Range);
+      const se=[];
+      SERIES.forEach(s=>{
+        if(!s2Active.has(s.key))return;
+        const map=Object.fromEntries(s.data.map(r=>[r.fecha,r]));
+        se.push({name:s.label,type:'line',data:dates.map(f=>map[f]?map[f][view.key]:null),symbol:'none',smooth:.15,lineStyle:{width:2.5,type:s.dashed?[6,4]:'solid',color:s.color},itemStyle:{color:s.color},connectNulls:true,
+          areaStyle:s.key==='ipp'?{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:dk?'rgba(37,99,235,.15)':'rgba(37,99,235,.08)'},{offset:1,color:'transparent'}])}:undefined});
+      });
+      if(view.isVar)se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#CBD5E1',type:[5,4]},itemStyle:{color:dk?'#333':'#CBD5E1'},z:0});
+
+      chart2.setOption({
+        color:SERIES.filter(s=>s2Active.has(s.key)).map(s=>s.color),backgroundColor:'transparent',
+        grid:{top:30,right:mob?12:20,bottom:40,left:mob?38:55},
+        tooltip:{trigger:'axis',confine:true,backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:mob?11:12,color:'#fff'},padding:mob?[8,10]:[12,16],extraCssText:'border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);max-width:90vw;',
+          formatter:params=>{if(!params.length)return'';let h=`<div style="font-weight:700;margin-bottom:6px;color:#E9D8A6;font-size:12px">${fdate(dates[params[0].dataIndex])}</div>`;params.forEach(p=>{if(p.value==null||p.seriesName==='Ref')return;h+=`<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span><span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span><span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${view.fmt(p.value)}</span></div>`});return h}},
+        xAxis:{type:'category',data:dates,axisLine:{lineStyle:{color:dk?'#222':'#DDE3EA'}},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:(v,i)=>{if(i===0||i===dates.length-1)return fdate(v);const step=Math.max(1,Math.round(dates.length/8));return i%step===0?fdate(v):''}}},
+        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>view.yFmt(v)}},
+        series:se
+      },true);
+    }
+    renderComp();
+
+    // ── Chart Grupos Bar ──────────────────────────────────
+    let chartG;
+    function renderGrupos(){
+      if(!chartG)chartG=echarts.init(document.getElementById('chart-grupos'));
+      const dk=isDark(),mob=window.innerWidth<520;
+      const g=gruposRanked;
+      chartG.setOption({
+        backgroundColor:'transparent',grid:{top:10,right:mob?55:70,bottom:30,left:mob?90:145},
+        tooltip:{trigger:'axis',confine:true,axisPointer:{type:'shadow'},backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:12,color:'#fff'},extraCssText:'border-radius:8px;',
+          formatter:p=>p[0]?`<div style="font-weight:700;margin-bottom:4px">${p[0].name}</div><div>Var. interanual: <b>${fpct(p[0].value)}</b></div><div style="font-size:11px;color:rgba(255,255,255,.5)">Ponderación: ${g.find(x=>x.name===p[0].name)?.pond}%</div>`:''
+        },
+        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        yAxis:{type:'category',data:g.map(x=>x.name),axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:mob?9:11,fontWeight:600,color:dk?'#A0A0A0':'#364555',width:mob?80:135,overflow:'truncate'}},
+        series:[{type:'bar',data:g.map((x,i)=>({value:x.v12,itemStyle:{color:GRP_COLORS[i],borderRadius:[0,4,4,0]}})),barWidth:16,label:{show:true,position:'right',fontFamily:'JetBrains Mono',fontSize:10,fontWeight:600,formatter:p=>fpct(p.value),color:dk?'#A0A0A0':'#364555'}}]
+      },true);
+    }
+    renderGrupos();
+
+    // ── Chart Origen Bar ──────────────────────────────────
+    let chartO;
+    function renderOrigen(){
+      if(!chartO)chartO=echarts.init(document.getElementById('chart-origen'));
+      const dk=isDark(),mob=window.innerWidth<520;
+      const cats=ipmOrigen.filter(c=>c.categoria!=='GENERAL').map(c=>{const l=c.series[c.series.length-1];return{name:c.categoria.replace('ORIGEN NACIONAL','Nacional').replace('ORIGEN IMPORTADOS','Importado').replace(/ — /g,' · '),val:l.var_12_meses,isNac:c.categoria.includes('NACIONAL')}}).sort((a,b)=>b.val-a.val);
+      chartO.setOption({
+        backgroundColor:'transparent',grid:{top:10,right:mob?55:70,bottom:30,left:mob?100:170},
+        tooltip:{trigger:'axis',confine:true,axisPointer:{type:'shadow'},backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:12,color:'#fff'},extraCssText:'border-radius:8px;',
+          formatter:p=>p[0]?`<div style="font-weight:700;margin-bottom:4px">${p[0].name}</div><div>Var. interanual: <b>${fpct(p[0].value)}</b></div>`:''
+        },
+        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        yAxis:{type:'category',data:cats.map(c=>c.name),axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:mob?9:11,fontWeight:600,color:dk?'#A0A0A0':'#364555',width:mob?90:160,overflow:'truncate'}},
+        series:[{type:'bar',data:cats.map(c=>({value:c.val,itemStyle:{color:c.isNac?C.nac:C.imp,borderRadius:[0,4,4,0]}})),barWidth:16,label:{show:true,position:'right',fontFamily:'JetBrains Mono',fontSize:10,fontWeight:600,formatter:p=>fpct(p.value),color:dk?'#A0A0A0':'#364555'}}]
+      },true);
+    }
+    renderOrigen();
+
+    // ── Chart Evolución Grupos ─────────────────────────────
+    let chartE,s4Range=2;
+    const s4RangeEl=document.getElementById('s4-ranges');
+    RANGES.forEach((r,i)=>{const b=document.createElement('button');b.className='rbtn'+(i===2?' active':'');b.textContent=r.l;b.addEventListener('click',()=>{s4Range=i;s4RangeEl.querySelectorAll('.rbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderEvol()});s4RangeEl.appendChild(b)});
+
+    function renderEvol(){
+      if(!chartE)chartE=echarts.init(document.getElementById('chart-evol'));
+      const dk=isDark(),mob=window.innerWidth<520,m=RANGES[s4Range].m;
+      const ds=new Set();ippGrupos.forEach(g=>{(m?g.series.slice(-m):g.series).forEach(r=>ds.add(r.fecha))});
+      const dates=[...ds].sort();
+      const se=ippGrupos.map((g,gi)=>{const map=Object.fromEntries(g.series.map(r=>[r.fecha,r]));return{name:g.grupo,type:'line',symbol:'none',smooth:.15,data:dates.map(f=>map[f]?map[f].var_12_meses:null),lineStyle:{width:2,color:GRP_COLORS[gi]},itemStyle:{color:GRP_COLORS[gi]},connectNulls:true}});
+      se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#CBD5E1',type:[5,4]},itemStyle:{color:dk?'#333':'#CBD5E1'},z:0});
+      chartE.setOption({
+        color:GRP_COLORS,backgroundColor:'transparent',grid:{top:mob?60:40,right:16,bottom:40,left:mob?40:55},
+        legend:{top:0,left:'center',textStyle:{fontFamily:'Inter',fontSize:mob?9:11,color:dk?'#A0A0A0':'#6B7A8D'},itemWidth:mob?12:16,itemHeight:3,itemGap:mob?8:16},
+        tooltip:{trigger:'axis',confine:true,backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:12,color:'#fff'},extraCssText:'border-radius:10px;',
+          formatter:params=>{if(!params.length)return'';let h=`<div style="font-weight:700;margin-bottom:6px;color:#E9D8A6">${fdate(dates[params[0].dataIndex])}</div>`;params.filter(p=>p.seriesName!=='Ref'&&p.value!=null).sort((a,b)=>b.value-a.value).forEach(p=>{h+=`<div style="display:flex;align-items:center;gap:8px;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span><span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span><span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${fpct(p.value)}</span></div>`});return h}
+        },
+        xAxis:{type:'category',data:dates,axisLine:{lineStyle:{color:dk?'#222':'#DDE3EA'}},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:(v,i)=>{if(i===0||i===dates.length-1)return fdate(v);const step=Math.max(1,Math.round(dates.length/8));return i%step===0?fdate(v):''}}},
+        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        series:se
+      },true);
+    }
+    renderEvol();
+
+    // ── Table ─────────────────────────────────────────────
+    function buildTable(){
+      const rows=comparativo.slice(-24).reverse();
+      let h=`<table><thead><tr><th>Período</th><th>IPP 12m</th><th>IPP Mensual</th><th>IPM 12m</th><th>IPM Mensual</th><th>Brecha</th></tr></thead><tbody>`;
+      rows.forEach(r=>{
+        const iv=r.ipp_var12,mv=r.ipm_var12;
+        const ippM=ipp.find(x=>x.fecha===r.fecha);
+        const ipmM=ipmGen.find(x=>x.fecha===r.fecha);
+        const brecha=iv!=null&&mv!=null?Math.abs(iv-mv).toFixed(1)+' pp':'—';
+        h+=`<tr><td>${fdate(r.fecha)}</td>
+          <td class="${iv>0?'td-up':iv<0?'td-down':''}">${iv!=null?fpct(iv):'—'}</td>
+          <td class="${ippM&&ippM.var_mensual>0?'td-up':ippM&&ippM.var_mensual<0?'td-down':''}">${ippM?fpct2(ippM.var_mensual):'—'}</td>
+          <td class="${mv>0?'td-up':mv<0?'td-down':''}">${mv!=null?fpct(mv):'—'}</td>
+          <td class="${ipmM&&ipmM.var_mensual>0?'td-up':ipmM&&ipmM.var_mensual<0?'td-down':''}">${ipmM?fpct2(ipmM.var_mensual):'—'}</td>
+          <td>${brecha}</td></tr>`;
+      });
+      h+='</tbody></table>';
+      document.getElementById('table-wrap').innerHTML=h;
+    }
+    buildTable();
+
+    // ── Methodology ───────────────────────────────────────
+    document.getElementById('method-grid').innerHTML=[
+      {title:'Índice de Precios Productor (IPP)',accent:'',text:`Mide la variación de precios a la <strong>salida de producción</strong>. Metodología <strong>Laspeyres</strong> con base 2016=100. Cubre <span class="mono">223 productos</span> en 6 grupos: Servicios, Industria Manufacturera, Minerales/Gas, Agrícolas, Pecuaria y Pesca. Es el <strong>primer indicador</strong> de presiones inflacionarias — cuando sube, anticipa alzas en IPM e IPC.`},
+      {title:'Índice de Precios al Por Mayor (IPM)',accent:'accent-ipm',text:'Mide precios en el <strong>canal mayorista</strong> (productor/importador → minorista). Distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En contexto de brecha cambiaria, el componente importado refleja el tipo de cambio paralelo, no el oficial de 6.96 Bs/$. Base 2016=100.'},
+      {title:'La cadena IPP → IPM → IPC',accent:'accent-nac',text:'Las presiones nacen en el <strong>IPP</strong> (productor), se transmiten al <strong>IPM</strong> (mayorista) con semanas de rezago, y llegan al <strong>IPC</strong> (consumidor) con 1-3 meses de rezago. Monitorear IPP e IPM permite <strong>anticipar la inflación al consumidor</strong> antes de que aparezca en los datos del IPC.'},
+      {title:'¿Qué es la variación interanual?',accent:'accent-imp',text:'Compara el nivel de precios de un mes con el <strong>mismo mes del año anterior</strong>. Elimina la estacionalidad y muestra la tendencia real. Una variación de +15% significa que los precios son 15% más altos que hace 12 meses. Es el indicador más estable para evaluar presiones.'},
+      {title:'¿Qué es la variación acumulada?',accent:'accent-nac',text:'Mide el cambio de precios <strong>desde enero del año en curso</strong>. Permite ver cuánto han subido los precios en lo que va del año. Es útil para evaluar la velocidad de aceleración: una acumulada alta en pocos meses anticipa un cierre de año con inflación elevada.'},
+      {title:'Inflación importada y tipo de cambio',accent:'accent-imp',text:'Cuando el boliviano se deprecia en el mercado paralelo, los bienes importados se encarecen — esto se refleja en el <strong>IPM Importado</strong>. Si este componente sube más que el Nacional, la inflación está siendo <strong>importada vía tipo de cambio</strong>, no generada internamente. Esta distinción es clave para diseñar política económica.'},
+      {title:'Ponderaciones y representatividad',accent:'',text:'Cada producto y grupo tiene un <strong>peso</strong> que refleja su importancia en la producción/comercio nacional. Servicios (37%) e Industria (35%) dominan el IPP. Las ponderaciones son fijas (base 2016) — no se ajustan por cambios en la estructura productiva, lo que es una limitación conocida del método Laspeyres.'},
+      {title:'Fuentes y actualización',accent:'accent-populi',text:'Datos del <strong>INE (Instituto Nacional de Estadística)</strong>. Publicación mensual ~día 15. Este dashboard se actualiza automáticamente los días 16, 18 y 20 mediante <strong>GitHub Actions</strong>. Código abierto y datos de libre acceso. Notas metodológicas completas disponibles en el sitio del INE.'},
+    ].map(m=>`<div class="method-card ${m.accent}"><h3>${m.title}</h3><p>${m.text}</p></div>`).join('');
+
+    // ── Resize + Theme ────────────────────────────────────
+    const charts=[chart2,chartG,chartO,chartE];
+    let resizeTimer;
+    window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{charts.forEach(c=>c&&c.resize());renderGrupos();renderOrigen();renderEvol();renderComp()},150)});
+    new MutationObserver(()=>{renderComp();renderGrupos();renderOrigen();renderEvol()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
