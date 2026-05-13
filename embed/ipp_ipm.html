@@ -9,414 +9,1062 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
   <style>
+    /* ── Variables — Tema Claro (Populi Website) ─────────────────── */
     :root {
-      --populi:#8B1A1A;--populi-dark:#6B0300;--populi-light:#C00000;
-      --cream:#F5EFE0;--brown-dark:#3D2B1F;
-      --navy:#0D1B2A;--navy-light:#1A2940;--slate:#475569;--slate-light:#64748B;
-      --warm-white:#FAF8F3;--border:#E2DDD3;--dark-border:#2A3A50;
-      --bg:var(--warm-white);--card:#FFFFFF;--text:var(--brown-dark);--muted:var(--slate-light);
-      --ct-ipp:#2563EB;--ct-ipm:#D97706;--ct-ref:#94A3B8;
-      --radius:12px;
+      --populi:       #8B1A1A;
+      --populi-dark:  #6B0300;
+      --populi-light: #C00000;
+      --populi-gold:  #D4A017;
+      --cream:        #F5EFE0;
+      --brown:        #5C3D1E;
+      --brown-dark:   #3D2B1F;
+      --navy:         #0D1B2A;
+      --navy-light:   #1A2940;
+      --slate:        #475569;
+      --slate-light:  #64748B;
+      --warm-white:   #FAF8F3;
+      --light-gray:   #F1EDE5;
+      --border:       #E2DDD3;
+      --dark-border:  #2A3A50;
+
+      --bg:   var(--warm-white);
+      --card: #FFFFFF;
+      --text: var(--brown-dark);
+      --text2: var(--slate);
+      --muted: var(--slate-light);
+
+      --ct-ipp:  #2563EB;
+      --ct-ipm:  #D97706;
+      --ct-nac:  #0D9488;
+      --ct-imp:  #C71E1D;
+
+      --shadow: 0 1px 3px rgba(13,27,42,.04), 0 4px 16px rgba(13,27,42,.06);
+      --radius: 12px;
     }
-    [data-theme="dark"]{--bg:#080808;--card:#141414;--text:#E2E8F0;--muted:#64748B;--border:#2A3A50;--cream:#1A2940}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
-    .wrap{max-width:1200px;margin:0 auto;padding:20px 16px}
-    .sec-title{font-family:'Playfair Display',Georgia,serif;font-size:1.55rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:10px;line-height:1.15;margin-bottom:2px}
-    [data-theme="dark"] .sec-title{color:#fff}
-    .accent-bar{width:4px;height:26px;background:var(--ct-ipp);border-radius:2px;flex-shrink:0}
-    .sec-sub{font-size:.78rem;color:var(--muted);padding-left:14px;margin-bottom:16px}
-    [data-theme="dark"] .sec-sub{color:rgba(255,255,255,.4)}
 
-    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-    @media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-    .kpi{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
-    [data-theme="dark"] .kpi{background:#141414;border-color:var(--dark-border)}
-    .kpi:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
-    .kpi::after{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
-    .kpi[data-s="ipp"]::after{background:var(--ct-ipp)}
-    .kpi[data-s="ipm"]::after{background:var(--ct-ipm)}
-    .kpi-lbl{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
-    [data-theme="dark"] .kpi-lbl{color:rgba(255,255,255,.4)}
-    .kpi-val{font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700}
-    .kpi-d{display:inline-flex;align-items:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:5px;margin-top:5px}
-    .kpi-d.up{background:rgba(199,30,29,.08);color:#C71E1D}
-    .kpi-d.down{background:rgba(5,150,105,.08);color:#059669}
-    .kpi-d.flat{background:rgba(100,116,139,.08);color:#64748B}
-    [data-theme="dark"] .kpi-d.up{background:rgba(199,30,29,.15)}
-    [data-theme="dark"] .kpi-d.down{background:rgba(5,150,105,.15)}
+    /* ── Variables — Tema Oscuro ──────────────────────────────────── */
+    [data-theme="dark"] {
+      --bg:          #080808;
+      --card:        #141414;
+      --text:        #E2E8F0;
+      --text2:       #94A3B8;
+      --muted:       #64748B;
+      --border:      #2A3A50;
+      --light-gray:  #1A1A1A;
+      --cream:       #1A2940;
+      --shadow: 0 2px 8px rgba(0,0,0,.5), 0 6px 24px rgba(0,0,0,.4);
+    }
 
-    .main-grid{display:grid;grid-template-columns:3fr 2fr;grid-template-rows:540px;gap:16px}
-    @media(max-width:900px){.main-grid{grid-template-columns:1fr;grid-template-rows:480px auto}}
-    @media(min-width:1100px){.main-grid{grid-template-rows:580px}}
+    /* ── Reset ────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 0;
+      margin: 0;
+      transition: background .25s ease, color .25s ease;
+    }
 
-    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;height:100%;overflow:hidden}
-    [data-theme="dark"] .chart-card{background:#141414;border-color:var(--dark-border)}
-    .chart-ctrl{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
-    .tog-grp{display:flex;gap:6px;flex-wrap:wrap}
-    .pill{display:flex;align-items:center;gap:5px;padding:4px 12px;border:1.5px solid;border-radius:8px;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;font-size:.68rem;font-weight:600;transition:all .2s}
-    .pill:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
-    .pill .dot{width:8px;height:8px;border-radius:50%}
-    .rng-grp{display:flex;gap:4px}
-    .rng{padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:600;color:var(--muted);transition:all .18s}
-    .rng.act{background:var(--navy);color:#fff;border-color:var(--navy)}
-    [data-theme="dark"] .rng{border-color:var(--dark-border)}
-    [data-theme="dark"] .rng.act{background:#fff;color:#0D1B2A}
-    .chart-area{flex:1;min-height:0}
+    .embed-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
 
-    .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:14px;height:100%;overflow-y:auto}
-    [data-theme="dark"] .panel{background:#141414;border-color:var(--dark-border)}
-    .panel-title{font-family:'Playfair Display',Georgia,serif;font-size:1.05rem;font-weight:700;color:var(--navy)}
-    [data-theme="dark"] .panel-title{color:#fff}
-    .ctx-box{background:var(--cream);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.55}
-    [data-theme="dark"] .ctx-box{background:#1A2940}
-    .ctx-box strong{color:var(--navy)}
-    [data-theme="dark"] .ctx-box strong{color:#93C5FD}
-    .lbl-row{display:flex;align-items:center;gap:8px;padding:6px 0}
-    .lbl-color{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-    .lbl-name{font-size:.78rem;font-weight:600;flex:1}
-    .lbl-val{font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700}
-    .ampliar{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:auto;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:.78rem;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s}
-    .ampliar:hover{border-color:var(--ct-ipp);color:var(--ct-ipp);background:rgba(37,99,235,.04)}
+    /* ── Section Header ──────────────────────────────────────────── */
+    .section-header {
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      line-height: 1.15;
+    }
+    [data-theme="dark"] .section-title { color: #fff; }
+    .section-title .accent-bar {
+      width: 4px;
+      height: 26px;
+      background: var(--ct-ipp);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding-left: 14px;
+      margin-top: 2px;
+    }
+    [data-theme="dark"] .section-subtitle { color: rgba(255,255,255,.4); }
 
-    .edu-section{margin-top:16px}
-    .edu{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;transition:border-color .2s}
-    [data-theme="dark"] .edu{border-color:var(--dark-border)}
-    .edu:hover{border-color:var(--ct-ipp)}
-    .edu-tog{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none}
-    .edu-t{font-size:.82rem;font-weight:700;color:var(--navy)}
-    [data-theme="dark"] .edu-t{color:#fff}
-    .edu-arr{font-size:.6rem;color:var(--muted);transition:transform .25s}
-    .edu.open .edu-arr{transform:rotate(180deg)}
-    .edu-c{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 16px;font-size:.8rem;line-height:1.6}
-    .edu.open .edu-c{max-height:600px;padding:0 16px 14px}
-    .edu-c p{margin-bottom:8px}
+    /* ── KPI Strip ───────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 700px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .kpi-card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform .2s, box-shadow .2s;
+    }
+    [data-theme="dark"] .kpi-card {
+      background: #141414;
+      border-color: var(--dark-border);
+    }
+    .kpi-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+    }
+    .kpi-card[data-s="ipp"]::after  { background: var(--ct-ipp); }
+    .kpi-card[data-s="ipm"]::after  { background: var(--ct-ipm); }
+    .kpi-card[data-s="nac"]::after  { background: var(--ct-nac); }
+    .kpi-card[data-s="imp"]::after  { background: var(--ct-imp); }
+    .kpi-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    [data-theme="dark"] .kpi-label { color: rgba(255,255,255,.4); }
+    .kpi-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .kpi-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+    .kpi-delta.up { background: rgba(199,30,29,.08); color: #C71E1D; }
+    .kpi-delta.down { background: rgba(5,150,105,.08); color: #059669; }
+    .kpi-delta.flat { background: rgba(100,116,139,.08); color: #64748B; }
+    [data-theme="dark"] .kpi-delta.up { background: rgba(199,30,29,.15); }
+    [data-theme="dark"] .kpi-delta.down { background: rgba(5,150,105,.15); }
 
-    .foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:.68rem;color:var(--muted)}
-    [data-theme="dark"] .foot{border-color:var(--dark-border)}
-    .foot a{color:var(--populi);font-weight:600;text-decoration:none}
-    .foot a:hover{text-decoration:underline}
-    .loading{display:flex;align-items:center;justify-content:center;height:400px;font-size:.9rem;color:var(--muted)}
+    /* ── Main Grid: Chart + Panel ────────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      grid-template-rows: 540px;
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; grid-template-rows: auto 480px; }
+    }
+    @media (min-width: 1100px) {
+      .main-grid { grid-template-rows: 580px; }
+    }
+
+    /* ── Chart Card ──────────────────────────────────────────────── */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    [data-theme="dark"] .chart-card {
+      background: #141414;
+      border-color: var(--dark-border);
+    }
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .toggle-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border: 1.5px solid;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: all .2s;
+    }
+    .toggle-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .toggle-pill .line-prev {
+      width: 16px; height: 0;
+      border-top: 2.5px solid;
+      border-radius: 1px;
+    }
+    .toggle-pill .line-prev.dashed { border-top-style: dashed; }
+
+    .controls-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .controls-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+    }
+    [data-theme="dark"] .controls-divider { background: var(--dark-border); }
+
+    .range-group { display: flex; gap: 4px; }
+    .range-btn {
+      padding: 4px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    [data-theme="dark"] .range-btn { border-color: var(--dark-border); color: #94A3B8; }
+    .range-btn:hover, .range-btn.active {
+      border-color: var(--populi);
+      color: var(--populi);
+    }
+    [data-theme="dark"] .range-btn:hover, [data-theme="dark"] .range-btn.active {
+      border-color: var(--populi-light);
+      color: var(--populi-light);
+    }
+
+    .chart-area {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .chart-source {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 0 2px;
+    }
+    .chart-source-text {
+      font-size: 0.58rem;
+      color: var(--muted);
+      opacity: .6;
+    }
+    .chart-source-text a {
+      color: var(--populi);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .chart-source-text a:hover { text-decoration: underline; }
+
+    /* ── Panel ────────────────────────────────────────────────────── */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    [data-theme="dark"] .panel {
+      background: #141414;
+      border-color: var(--dark-border);
+    }
+    .panel-header {
+      background: var(--navy);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    [data-theme="dark"] .panel-header { background: var(--navy-light); }
+    .panel-header-title {
+      font-size: 0.56rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,.8);
+    }
+    .panel-header-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem;
+      font-weight: 600;
+      color: var(--populi-light);
+      background: rgba(199,30,29,.15);
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .panel-body {
+      padding: 14px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .panel-block {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    [data-theme="dark"] .panel-block { border-color: var(--dark-border); }
+    .panel-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .panel-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+      padding: 2px 9px 2px 6px;
+      border-radius: 4px;
+      border-left: 3px solid;
+    }
+    .panel-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .panel-desc {
+      font-size: 0.66rem;
+      line-height: 1.55;
+      color: var(--slate-light);
+    }
+    [data-theme="dark"] .panel-desc { color: rgba(255,255,255,.45); }
+    .panel-desc strong { color: var(--navy); }
+    [data-theme="dark"] .panel-desc strong { color: #E2E8F0; }
+
+    .delta-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      white-space: nowrap;
+    }
+    .dt-blue   { background: rgba(37,99,235,.08);  color: #2563EB; }
+    .dt-amber  { background: rgba(217,119,6,.08);  color: #D97706; }
+    .dt-teal   { background: rgba(13,148,136,.08);  color: #0D9488; }
+    .dt-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
+
+    /* ── Context Analysis ─────────────────────────────────────────── */
+    .ctx-box {
+      background: var(--cream);
+      border-radius: 6px;
+      padding: 8px 10px;
+      border-left: 3px solid var(--populi);
+      margin-top: 6px;
+    }
+    [data-theme="dark"] .ctx-box { background: var(--navy-light); }
+    .ctx-box p {
+      font-size: 0.66rem;
+      line-height: 1.55;
+      color: var(--slate-light);
+    }
+    [data-theme="dark"] .ctx-box p { color: #94A3B8; }
+    .ctx-box p strong { color: var(--navy); }
+    [data-theme="dark"] .ctx-box p strong { color: #E2E8F0; }
+
+    /* ── Edu Boxes ────────────────────────────────────────────────── */
+    .edu-box {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--populi);
+      margin-top: 4px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    [data-theme="dark"] .edu-box { background: var(--navy-light); }
+    .edu-box:hover { transform: translateY(-1px); }
+    .edu-box-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .edu-box-title {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--populi);
+    }
+    [data-theme="dark"] .edu-box-title { color: var(--populi-light); }
+    .edu-box-arrow {
+      font-size: 0.6rem;
+      color: var(--muted);
+      transition: transform .2s;
+    }
+    .edu-box.open .edu-box-arrow { transform: rotate(180deg); }
+    .edu-box-content {
+      display: none;
+      margin-top: 8px;
+    }
+    .edu-box.open .edu-box-content { display: block; }
+    .edu-box-content p {
+      font-size: 0.66rem;
+      line-height: 1.6;
+      color: var(--slate-light);
+      margin-bottom: 6px;
+    }
+    .edu-box-content p:last-child { margin-bottom: 0; }
+    [data-theme="dark"] .edu-box-content p { color: #94A3B8; }
+    .edu-box-content p strong { color: var(--navy); }
+    [data-theme="dark"] .edu-box-content p strong { color: #E2E8F0; }
+    .edu-box-content .highlight {
+      display: inline;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92em;
+      font-weight: 600;
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+    .hl-blue   { background: rgba(37,99,235,.08);  color: #2563EB; }
+    .hl-amber  { background: rgba(217,119,6,.08);  color: #D97706; }
+    .hl-teal   { background: rgba(13,148,136,.08);  color: #0D9488; }
+    .hl-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
+
+    /* ── Ampliar Button ──────────────────────────────────────────── */
+    .panel-footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+    [data-theme="dark"] .panel-footer { border-color: var(--dark-border); }
+    .ampliar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px 0;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--populi);
+      background: rgba(139,26,26,.06);
+      border: 1.5px solid rgba(139,26,26,.15);
+      transition: all .2s;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    [data-theme="dark"] .ampliar-btn {
+      background: rgba(192,0,0,.08);
+      border-color: rgba(192,0,0,.2);
+      color: var(--populi-light);
+    }
+    .ampliar-btn:hover {
+      background: rgba(139,26,26,.12);
+      border-color: rgba(139,26,26,.3);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(139,26,26,.1);
+      text-decoration: none;
+    }
+    .ampliar-btn svg {
+      width: 13px; height: 13px;
+    }
+
+    /* ── Watermark ────────────────────────────────────────────────── */
+    .watermark {
+      height: 15px;
+      width: auto;
+      opacity: .18;
+    }
+    [data-theme="dark"] .watermark { opacity: .10; }
+
+    /* ── Loading ──────────────────────────────────────────────────── */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 400px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--populi);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 0.75rem; }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="sec-title"><span class="accent-bar"></span>IPP e IPM</div>
-  <p class="sec-sub">Índice de Precios Productor y Precios al Por Mayor — Base 2016=100</p>
-
-  <div id="kpis" class="kpi-grid"></div>
-
-  <div class="main-grid">
-    <div class="chart-card">
-      <div class="chart-ctrl">
-        <div class="tog-grp" id="toggles"></div>
-        <div class="rng-grp" id="ranges"></div>
-      </div>
-      <div class="chart-area" id="chart"></div>
-    </div>
-    <div class="panel" id="panel">
-      <div class="panel-title">Lectura del indicador</div>
-      <div id="ctx" class="ctx-box">Cargando datos...</div>
-      <div id="labels"></div>
-      <a class="ampliar" href="https://centro-de-estudios-populi.github.io/populi-precios-productor/" target="_blank">
-        Ampliar análisis →
-      </a>
+  <div class="embed-container" id="app">
+    <div class="loading" id="loader">
+      <div class="spinner"></div>
+      <span class="loading-text">Cargando datos de precios productor y mayorista...</span>
     </div>
   </div>
 
-  <div class="edu-section" id="edu"></div>
+  <script>
+  (function() {
+    const BASE = 'https://centro-de-estudios-populi.github.io/populi-precios-productor/data/';
+    const DASHBOARD_URL = 'https://centro-de-estudios-populi.github.io/populi-precios-productor/';
 
-  <div class="foot">
-    <span>Fuente: <a href="https://www.ine.gob.bo" target="_blank">INE Bolivia</a> · Elaboración: <a href="https://populi.org.bo" target="_blank">POPULI</a></span>
-    <span id="updated" style="font-family:'JetBrains Mono',monospace"></span>
-  </div>
-</div>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('theme') === 'dark') document.documentElement.dataset.theme = 'dark';
 
-<div class="loading" id="loader">Cargando datos de precios productor...</div>
+    window.addEventListener('message', e => {
+      if (e.data && e.data.theme) document.documentElement.dataset.theme = e.data.theme;
+    });
 
-<script>
-// Theme sync
-const params = new URLSearchParams(location.search);
-if (params.get('theme') === 'dark') document.documentElement.dataset.theme = 'dark';
-window.addEventListener('message', e => { if (e.data && e.data.theme) document.documentElement.dataset.theme = e.data.theme });
-
-(function(){
-  const BASE = 'https://centro-de-estudios-populi.github.io/populi-precios-productor/data/';
-  const C_IPP = '#2563EB', C_IPM = '#D97706';
-
-  const VIEWS = [
-    { key:'var_12_meses', label:'Var. interanual', fmt:v=>(v>=0?'+':'')+v.toFixed(1)+'%' },
-    { key:'var_mensual', label:'Var. mensual', fmt:v=>(v>=0?'+':'')+v.toFixed(2)+'%' },
-    { key:'indice', label:'Índice', fmt:v=>v.toFixed(1) },
-  ];
-  const RANGES = [
-    { label:'2A', meses:24 },
-    { label:'5A', meses:60 },
-    { label:'Todo', meses:0 },
-  ];
-
-  let ipp=[], ipm=[], meta={}, chart, curView=0, curRange=0;
-
-  async function init(){
-    const [ippR,ipmR,metaR] = await Promise.all([
-      fetch(BASE+'ipp_general.json').then(r=>r.json()),
-      fetch(BASE+'ipm_general.json').then(r=>r.json()),
-      fetch(BASE+'metadata.json').then(r=>r.json()),
-    ]);
-    ipp=ippR; ipm=ipmR; meta=metaR;
-    document.getElementById('loader').style.display='none';
-    document.querySelector('.wrap').style.display='block';
-
-    // Updated timestamp
-    if(meta.actualizado){
-      const d=new Date(meta.actualizado);
-      document.getElementById('updated').textContent='Act. '+d.toLocaleDateString('es-BO',{day:'numeric',month:'short',year:'numeric'});
+    function isDark() { return document.documentElement.dataset.theme === 'dark'; }
+    function fpct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+    function fdate(f) {
+      const [y, m] = f.split('-');
+      const mn = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      return mn[+m - 1] + ' ' + y;
     }
 
-    buildKPIs();
-    buildToggles();
-    buildRanges();
-    chart = echarts.init(document.getElementById('chart'));
-    buildChart();
-    updatePanel();
-    window.addEventListener('resize',()=>chart&&chart.resize());
-    new MutationObserver(()=>{buildChart();buildKPIs()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-
-    buildEdu();
-  }
-
-  function fmtDate(f){
-    const [y,m]=f.split('-');
-    const mn=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-    return mn[+m-1]+' '+y;
-  }
-
-  function buildKPIs(){
-    const lastIPP = ipp[ipp.length-1]||{};
-    const prevIPP = ipp[ipp.length-2]||{};
-    const lastIPM = ipm[ipm.length-1]||{};
-    const prevIPM = ipm[ipm.length-2]||{};
-
-    const deltaClass=(cur,prev)=>{
-      if(cur==null||prev==null) return 'flat';
-      return cur>prev?'up':cur<prev?'down':'flat';
-    };
-    const deltaIcon=(cls)=>cls==='up'?'▲':cls==='down'?'▼':'—';
-
-    const kpis=[
-      {s:'ipp',lbl:'IPP Interanual',val:lastIPP.var_12_meses!=null?(lastIPP.var_12_meses>=0?'+':'')+lastIPP.var_12_meses.toFixed(1)+'%':'—',
-       d:lastIPP.var_12_meses!=null&&prevIPP.var_12_meses!=null?(lastIPP.var_12_meses-prevIPP.var_12_meses>=0?'+':'')+(lastIPP.var_12_meses-prevIPP.var_12_meses).toFixed(1)+' pp':'',
-       cls:deltaClass(lastIPP.var_12_meses,prevIPP.var_12_meses)},
-      {s:'ipm',lbl:'IPM Interanual',val:lastIPM.var_12_meses!=null?(lastIPM.var_12_meses>=0?'+':'')+lastIPM.var_12_meses.toFixed(1)+'%':'—',
-       d:lastIPM.var_12_meses!=null&&prevIPM.var_12_meses!=null?(lastIPM.var_12_meses-prevIPM.var_12_meses>=0?'+':'')+(lastIPM.var_12_meses-prevIPM.var_12_meses).toFixed(1)+' pp':'',
-       cls:deltaClass(lastIPM.var_12_meses,prevIPM.var_12_meses)},
-      {s:'ipp',lbl:'IPP Índice',val:lastIPP.indice!=null?lastIPP.indice.toFixed(1):'—',
-       d:lastIPP.fecha?fmtDate(lastIPP.fecha):'',cls:'flat'},
-      {s:'ipm',lbl:'IPM Índice',val:lastIPM.indice!=null?lastIPM.indice.toFixed(1):'—',
-       d:lastIPM.fecha?fmtDate(lastIPM.fecha):'',cls:'flat'},
+    const SERIES_CFG = [
+      { key: 'ipp',  label: 'IPP',          color: '#2563EB', dashed: false },
+      { key: 'ipm',  label: 'IPM General',   color: '#D97706', dashed: false },
+      { key: 'nac',  label: 'IPM Nacional',   color: '#0D9488', dashed: true },
+      { key: 'imp',  label: 'IPM Importado',  color: '#C71E1D', dashed: true },
     ];
 
-    document.getElementById('kpis').innerHTML=kpis.map(k=>`
-      <div class="kpi" data-s="${k.s}">
-        <div class="kpi-lbl">${k.lbl}</div>
-        <div class="kpi-val">${k.val}</div>
-        ${k.d?`<span class="kpi-d ${k.cls}">${deltaIcon(k.cls)} ${k.d}</span>`:''}
-      </div>`).join('');
-  }
+    const VIEWS = [
+      { key: 'var_12_meses', label: 'Interanual', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%', isVar: true },
+      { key: 'var_mensual',  label: 'Mensual',    fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', isVar: true },
+      { key: 'indice',       label: 'Índice',     fmt: v => v.toFixed(1), yFmt: v => v.toFixed(0), isVar: false },
+    ];
 
-  function buildToggles(){
-    document.getElementById('toggles').innerHTML=VIEWS.map((v,i)=>`
-      <button class="pill${i===0?' act':''}" data-v="${i}"
-        style="border-color:${i===0?C_IPP:'var(--border)'};color:${i===0?C_IPP:'var(--muted)'}">
-        ${v.label}
-      </button>`).join('');
+    const RANGES = [
+      { label: '2A', meses: 24 },
+      { label: '5A', meses: 60 },
+      { label: 'Todo', meses: 0 },
+    ];
 
-    document.querySelectorAll('#toggles .pill').forEach(b=>{
-      b.addEventListener('click',()=>{
-        curView=+b.dataset.v;
-        document.querySelectorAll('#toggles .pill').forEach((p,j)=>{
-          p.classList.toggle('act',j===curView);
-          p.style.borderColor=j===curView?C_IPP:'var(--border)';
-          p.style.color=j===curView?C_IPP:'var(--muted)';
+    let ippData = [], ipmGen = [], ipmNac = [], ipmImp = [];
+    let active = new Set(SERIES_CFG.map(s => s.key));
+    let curView = 0, curRange = 0;
+    let chart = null, curIdx = -1;
+
+    async function init() {
+      let ippRaw, origenRaw, metaRaw;
+      try {
+        [ippRaw, origenRaw, metaRaw] = await Promise.all([
+          fetch(BASE + 'ipp_general.json').then(r => r.json()),
+          fetch(BASE + 'ipm_origen.json').then(r => r.json()),
+          fetch(BASE + 'metadata.json').then(r => r.json()),
+        ]);
+      } catch(e) {
+        document.getElementById('loader').innerHTML =
+          '<span class="loading-text" style="color:var(--ct-imp)">Error al cargar datos. Intente recargar.</span>';
+        return;
+      }
+
+      ippData = ippRaw;
+      const origenMap = {};
+      origenRaw.forEach(cat => { origenMap[cat.categoria] = cat.series; });
+      ipmGen = origenMap['GENERAL'] || [];
+      ipmNac = origenMap['ORIGEN NACIONAL'] || [];
+      ipmImp = origenMap['ORIGEN IMPORTADOS'] || [];
+
+      const allSeries = { ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp };
+
+      const app = document.getElementById('app');
+      app.innerHTML = buildHTML(metaRaw);
+
+      buildKPIs(allSeries);
+      buildToggles();
+      buildViews();
+      buildRanges();
+
+      chart = echarts.init(document.getElementById('chart'));
+      buildChart(allSeries);
+      updatePanel(allSeries, getLastCommonIdx(allSeries));
+
+      window.addEventListener('resize', () => chart && chart.resize());
+
+      new MutationObserver(() => {
+        buildChart(allSeries);
+        updatePanel(allSeries, curIdx);
+        buildKPIs(allSeries);
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+
+    function buildHTML(meta) {
+      const dk = isDark();
+      const updTxt = meta.actualizado
+        ? new Date(meta.actualizado).toLocaleDateString('es-BO', { day:'numeric', month:'short', year:'numeric' })
+        : '';
+
+      return `
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="accent-bar"></span>
+            Precios Productor y Mayorista
+          </h2>
+          <p class="section-subtitle">IPP e IPM — Base 2016=100 · Serie mensual${updTxt ? ' · Act. ' + updTxt : ''}</p>
+        </div>
+
+        <div class="kpi-grid" id="kpis"></div>
+
+        <div class="main-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-header-title">Lectura del indicador</span>
+              <span class="panel-header-date" id="panel-date"></span>
+            </div>
+            <div class="panel-body" id="panel-body"></div>
+            <div class="panel-footer">
+              <a href="${DASHBOARD_URL}" target="_blank" class="ampliar-btn">
+                <span>Ampliar análisis</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-controls">
+              <div class="toggle-group" id="toggles"></div>
+              <div class="controls-right">
+                <div class="range-group" id="views"></div>
+                <div class="controls-divider"></div>
+                <div class="range-group" id="ranges"></div>
+              </div>
+            </div>
+            <div class="chart-area" id="chart"></div>
+            <div class="chart-source">
+              <span class="chart-source-text">
+                Fuente: <a href="https://www.ine.gob.bo" target="_blank">INE Bolivia</a> ·
+                Elaboración: <a href="https://populi.org.bo" target="_blank">Centro de Estudios POPULI</a>
+              </span>
+              <svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" class="watermark">
+                <text x="6" y="112" font-family="'Playfair Display', Georgia, serif" font-size="145" font-weight="700" fill="${dk ? '#C00000' : '#8B1A1A'}">P</text>
+                <text x="92" y="87" font-family="'Playfair Display', Georgia, serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" fill="${dk ? '#F5EFE0' : '#3D2B1F'}">opuli</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin-top:16px;" id="edu-boxes"></div>
+      `;
+    }
+
+    function buildKPIs(allSeries) {
+      const view = VIEWS[curView];
+      const kpis = SERIES_CFG.map(s => {
+        const arr = allSeries[s.key];
+        const last = arr[arr.length - 1] || {};
+        const prev = arr[arr.length - 2] || {};
+        const val = last[view.key];
+        const prevVal = prev[view.key];
+        const d = (val != null && prevVal != null) ? val - prevVal : 0;
+        const cls = Math.abs(d) < 0.01 ? 'flat' : (d > 0 ? 'up' : 'down');
+        const arrow = cls === 'up' ? '&#9650;' : cls === 'down' ? '&#9660;' : '&#8212;';
+        return `<div class="kpi-card" data-s="${s.key === 'ipm' ? 'ipm' : s.key === 'nac' ? 'nac' : s.key === 'imp' ? 'imp' : 'ipp'}">
+          <div class="kpi-label">${s.label}</div>
+          <div class="kpi-value" style="color:${s.color}">${val != null ? view.fmt(val) : '—'}</div>
+          <div class="kpi-delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)} pp</div>
+        </div>`;
+      });
+      document.getElementById('kpis').innerHTML = kpis.join('');
+    }
+
+    function buildToggles() {
+      const el = document.getElementById('toggles');
+      SERIES_CFG.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'toggle-pill';
+        btn.dataset.key = s.key;
+        btn.innerHTML = `<span class="line-prev${s.dashed ? ' dashed' : ''}" style="border-color:#fff"></span>${s.label}`;
+        btn.addEventListener('click', () => {
+          if (active.has(s.key)) {
+            if (active.size === 1) return;
+            active.delete(s.key);
+          } else {
+            active.add(s.key);
+          }
+          syncPills();
+          rebuildAll();
         });
-        buildChart();
-        updatePanel();
+        el.appendChild(btn);
       });
-    });
-  }
-
-  function buildRanges(){
-    document.getElementById('ranges').innerHTML=RANGES.map((r,i)=>`
-      <button class="rng${i===0?' act':''}" data-r="${i}">${r.label}</button>`).join('');
-    document.querySelectorAll('#ranges .rng').forEach(b=>{
-      b.addEventListener('click',()=>{
-        curRange=+b.dataset.r;
-        document.querySelectorAll('#ranges .rng').forEach((p,j)=>p.classList.toggle('act',j===curRange));
-        buildChart();
-      });
-    });
-  }
-
-  function getSliced(arr){
-    const m=RANGES[curRange].meses;
-    return m?arr.slice(-m):arr;
-  }
-
-  function buildChart(){
-    const d=document.documentElement.dataset.theme==='dark';
-    const view=VIEWS[curView];
-    const ippSlice=getSliced(ipp);
-    const ipmSlice=getSliced(ipm);
-
-    // Merge dates
-    const allDates=new Set();
-    ippSlice.forEach(r=>allDates.add(r.fecha));
-    ipmSlice.forEach(r=>allDates.add(r.fecha));
-    const dates=[...allDates].sort();
-
-    const ippMap=Object.fromEntries(ippSlice.map(r=>[r.fecha,r]));
-    const ipmMap=Object.fromEntries(ipmSlice.map(r=>[r.fecha,r]));
-
-    const ippData=dates.map(f=>ippMap[f]?ippMap[f][view.key]:null);
-    const ipmData=dates.map(f=>ipmMap[f]?ipmMap[f][view.key]:null);
-
-    // X-axis label formatter
-    const labels=dates.map((f,i)=>{
-      if(i===0||i===dates.length-1) return fmtDate(f);
-      const prevM=dates[i-1].split('-')[1];
-      const curM=f.split('-')[1];
-      if(curM!==prevM&&curM==='01') return f.split('-')[0];
-      return '';
-    });
-    const step=Math.max(1,Math.round(dates.length/8));
-    const xLabels=dates.map((f,i)=>{
-      if(i===0||i===dates.length-1) return fmtDate(f);
-      if(i%step===0) return fmtDate(f);
-      return '';
-    });
-
-    const series=[
-      {
-        name:'IPP',type:'line',data:ippData,
-        lineStyle:{width:2.5,color:C_IPP},itemStyle:{color:C_IPP},
-        symbol:'none',smooth:0.15,
-        areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:d?'rgba(37,99,235,.2)':'rgba(37,99,235,.08)'},{offset:1,color:'transparent'}])}
-      },
-      {
-        name:'IPM',type:'line',data:ipmData,
-        lineStyle:{width:2.5,color:C_IPM},itemStyle:{color:C_IPM},
-        symbol:'none',smooth:0.15,
-      },
-    ];
-
-    // Reference line at 0 for var views
-    const isVar=view.key.startsWith('var');
-    const markLine=isVar?{
-      data:[{yAxis:0,lineStyle:{color:d?'#475569':'#CBD5E1',type:'solid',width:1},label:{show:false}}],
-      symbol:'none',silent:true
-    }:undefined;
-    if(markLine) series[0].markLine=markLine;
-
-    chart.setOption({
-      tooltip:{
-        trigger:'axis',backgroundColor:d?'#1E293B':'#fff',borderColor:d?'#334155':'#E2E8F0',
-        textStyle:{color:d?'#E2E8F0':'#1E293B',fontFamily:'Inter',fontSize:12},
-        formatter:params=>{
-          const f=dates[params[0].dataIndex];
-          let h=`<div style="font-weight:700;margin-bottom:4px">${fmtDate(f)}</div>`;
-          params.forEach(p=>{
-            if(p.value!=null) h+=`<div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span><span>${p.seriesName}:</span><strong>${view.fmt(p.value)}</strong></div>`;
-          });
-          return h;
-        }
-      },
-      grid:{left:55,right:20,top:20,bottom:35},
-      xAxis:{
-        type:'category',data:dates,
-        axisLine:{lineStyle:{color:d?'#1E1E1E':'#E2E8F0'}},
-        axisTick:{show:false},
-        axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:d?'#64748B':'#94A3B8',
-          formatter:(v,i)=>xLabels[i]||''}
-      },
-      yAxis:{
-        type:'value',
-        splitLine:{lineStyle:{color:d?'#1E1E1E':'#F1F5F9',type:'dashed'}},
-        axisLine:{show:false},axisTick:{show:false},
-        axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:d?'#64748B':'#94A3B8',
-          formatter:v=>isVar?(v>=0?'+':'')+v.toFixed(0)+'%':v.toFixed(0)}
-      },
-      series:series
-    },true);
-  }
-
-  function updatePanel(){
-    const view=VIEWS[curView];
-    const lastIPP=ipp[ipp.length-1]||{};
-    const lastIPM=ipm[ipm.length-1]||{};
-    const ippV=lastIPP[view.key];
-    const ipmV=lastIPM[view.key];
-
-    // Labels
-    const labelsHTML=[
-      {name:'IPP — Precios Productor',color:C_IPP,val:ippV!=null?view.fmt(ippV):'—',date:lastIPP.fecha},
-      {name:'IPM — Precios al Por Mayor',color:C_IPM,val:ipmV!=null?view.fmt(ipmV):'—',date:lastIPM.fecha},
-    ].map(l=>`
-      <div class="lbl-row">
-        <span class="lbl-color" style="background:${l.color}"></span>
-        <span class="lbl-name">${l.name}</span>
-        <span class="lbl-val">${l.val}</span>
-      </div>`).join('');
-    document.getElementById('labels').innerHTML=labelsHTML;
-
-    // Context box
-    let ctx='';
-    if(view.key==='var_12_meses'&&ippV!=null&&ipmV!=null){
-      const diff=Math.abs(ippV-ipmV).toFixed(1);
-      const higher=ippV>ipmV?'IPP':'IPM';
-      const lower=ippV>ipmV?'IPM':'IPP';
-
-      if(ippV>20||ipmV>20){
-        ctx=`<strong>Presiones inflacionarias severas en la cadena productiva.</strong> Con el ${higher} en ${Math.max(ippV,ipmV).toFixed(1)}%, los precios al inicio de la cadena anticipan una inflación al consumidor persistente. La brecha entre IPP e IPM es de ${diff} pp — ${ippV>ipmV?'los productores enfrentan costos que aún no se trasladan completamente al canal mayorista':'los precios mayoristas reflejan presiones adicionales del tipo de cambio en bienes importados'}.`;
-      } else if(ippV>10||ipmV>10){
-        ctx=`<strong>Presiones significativas en precios de producción y distribución.</strong> El ${higher} (+${Math.max(ippV,ipmV).toFixed(1)}%) lidera las alzas con ${diff} pp sobre el ${lower}. Estas presiones se trasladan con rezago al IPC — el consumidor las sentirá en los próximos meses.`;
-      } else if(ippV>4||ipmV>4){
-        ctx=`<strong>Presiones moderadas.</strong> Tanto IPP (+${ippV.toFixed(1)}%) como IPM (+${ipmV.toFixed(1)}%) muestran variaciones por encima del rango de estabilidad. La diferencia de ${diff} pp indica ${ippV>ipmV?'que el canal mayorista absorbe parte del impacto':'que los márgenes de distribución amplifican el alza'}.`;
-      } else {
-        ctx=`<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en +${ippV.toFixed(1)}% e IPM en +${ipmV.toFixed(1)}% sugieren presiones contenidas a lo largo de la cadena de precios.`;
-      }
-    } else if(view.key==='var_mensual'){
-      const v=ippV!=null?ippV:ipmV;
-      ctx=v!=null?`La variación mensual muestra el cambio de precios respecto al mes anterior. ${v>1?'Una variación superior al 1% mensual es inusual e indica un shock de precios en la cadena productiva.':v>0?'Variación positiva moderada — las presiones se acumulan mes a mes.':'Variación negativa — alivio temporal en costos de producción, posiblemente estacional.'}`:'Datos no disponibles para este período.';
-    } else {
-      ctx=`El índice base 2016=100 muestra cuánto han cambiado los precios respecto al año de referencia. Un valor de ${ippV!=null?ippV.toFixed(0):'—'} implica un aumento acumulado de ${ippV!=null?(ippV-100).toFixed(0):'—'}% desde 2016 en precios al productor.`;
+      syncPills();
     }
-    document.getElementById('ctx').innerHTML=ctx;
-  }
 
-  function buildEdu(){
-    document.getElementById('edu').innerHTML=[
-      {
-        title:'¿Qué son el IPP y el IPM?',
-        content:`<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>
-        <p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>`
-      },
-      {
-        title:'¿Cómo se relacionan IPP, IPM e IPC?',
-        content:`<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>
-        <p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución. Monitorear los tres permite anticipar la inflación al consumidor antes de que se materialice.</p>`
-      },
-      {
-        title:'El canal importado y el tipo de cambio',
-        content:`<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria como el de Bolivia, los bienes importados reflejan el tipo de cambio paralelo, no el oficial de 6.96 Bs/$. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>
-        <p>Los sectores más expuestos son la industria manufacturera (insumos importados) y los alimentos procesados. Esta distinción permite evaluar cuánto de la inflación se origina internamente y cuánto se "importa" vía tipo de cambio.</p>`
+    function syncPills() {
+      document.querySelectorAll('.toggle-pill').forEach(btn => {
+        const s = SERIES_CFG.find(x => x.key === btn.dataset.key);
+        const on = active.has(s.key);
+        btn.style.backgroundColor = on ? s.color : 'transparent';
+        btn.style.color = on ? '#fff' : s.color;
+        btn.style.borderColor = s.color;
+        const line = btn.querySelector('.line-prev');
+        if (line) line.style.borderColor = on ? '#fff' : s.color;
+      });
+    }
+
+    function buildViews() {
+      const el = document.getElementById('views');
+      VIEWS.forEach((v, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'range-btn' + (i === 0 ? ' active' : '');
+        btn.textContent = v.label;
+        btn.addEventListener('click', () => {
+          curView = i;
+          document.querySelectorAll('#views .range-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          rebuildAll();
+        });
+        el.appendChild(btn);
+      });
+    }
+
+    function buildRanges() {
+      const el = document.getElementById('ranges');
+      RANGES.forEach((r, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'range-btn' + (i === RANGES.length - 1 ? ' active' : '');
+        btn.textContent = r.label;
+        btn.addEventListener('click', () => {
+          curRange = i;
+          document.querySelectorAll('#ranges .range-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          rebuildAll();
+        });
+        el.appendChild(btn);
+      });
+    }
+
+    function rebuildAll() {
+      const allSeries = { ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp };
+      buildChart(allSeries);
+      buildKPIs(allSeries);
+      updatePanel(allSeries, curIdx);
+    }
+
+    function getLastCommonIdx(allSeries) {
+      const allDates = mergedDates(allSeries, 0);
+      return allDates.length - 1;
+    }
+
+    function mergedDates(allSeries, rangeIdx) {
+      const meses = RANGES[rangeIdx].meses;
+      const dateSet = new Set();
+      SERIES_CFG.forEach(s => {
+        if (!active.has(s.key)) return;
+        const arr = allSeries[s.key];
+        const sliced = meses > 0 ? arr.slice(-meses) : arr;
+        sliced.forEach(r => dateSet.add(r.fecha));
+      });
+      return [...dateSet].sort();
+    }
+
+    function buildChart(allSeries) {
+      const container = document.getElementById('chart');
+      if (!chart) chart = echarts.init(container);
+
+      const dk = isDark();
+      const view = VIEWS[curView];
+      const meses = RANGES[curRange].meses;
+      const dates = mergedDates(allSeries, curRange);
+      if (dates.length === 0) return;
+
+      const seriesEch = [];
+      const colors = [];
+
+      SERIES_CFG.forEach(s => {
+        if (!active.has(s.key)) return;
+        colors.push(s.color);
+        const arr = allSeries[s.key];
+        const map = Object.fromEntries(arr.map(r => [r.fecha, r]));
+        const vals = dates.map(f => map[f] ? map[f][view.key] : null);
+
+        const lastValid = vals.filter(v => v != null).pop();
+        const lastIdx = vals.lastIndexOf(lastValid);
+
+        seriesEch.push({
+          name: s.label,
+          type: 'line',
+          data: vals,
+          symbol: 'none',
+          smooth: 0.15,
+          lineStyle: { width: 2.5, type: s.dashed ? [6, 4] : 'solid' },
+          connectNulls: true,
+          areaStyle: (s.key === 'ipp' || s.key === 'ipm') ? {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: s.key === 'ipp'
+                ? (dk ? 'rgba(37,99,235,.2)' : 'rgba(37,99,235,.1)')
+                : (dk ? 'rgba(217,119,6,.15)' : 'rgba(217,119,6,.08)') },
+              { offset: 1, color: 'transparent' }
+            ])
+          } : undefined,
+          markPoint: lastIdx >= 0 ? {
+            data: [{ coord: [lastIdx, lastValid] }],
+            symbol: 'circle', symbolSize: 7,
+            itemStyle: { color: s.color, borderColor: dk ? '#141414' : '#fff', borderWidth: 2 },
+            label: { show: false }
+          } : undefined,
+          z: s.key === 'ipp' ? 4 : s.key === 'ipm' ? 3 : 2
+        });
+      });
+
+      if (view.isVar) {
+        seriesEch.push({
+          name: 'Ref 0%',
+          type: 'line',
+          data: dates.map(() => 0),
+          symbol: 'none',
+          lineStyle: { width: 1.5, color: dk ? '#475569' : '#CBD5E1', type: [5, 4] },
+          itemStyle: { color: dk ? '#475569' : '#CBD5E1' },
+          z: 1
+        });
       }
-    ].map(e=>`<div class="edu" onclick="this.classList.toggle('open')"><div class="edu-tog"><span class="edu-t">${e.title}</span><span class="edu-arr">&#9660;</span></div><div class="edu-c">${e.content}</div></div>`).join('');
-  }
 
-  // Hide wrap until loaded
-  document.querySelector('.wrap').style.display='none';
-  init();
-})();
-</script>
+      const option = {
+        color: colors,
+        backgroundColor: 'transparent',
+        grid: { top: 30, right: 16, bottom: 44, left: 52 },
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: dk ? '#080808' : 'rgba(13,27,42,.96)',
+          borderColor: dk ? '#2A3A50' : '#1A2940',
+          textStyle: { fontFamily: 'Inter', fontSize: 12, color: '#fff' },
+          padding: [12, 16],
+          extraCssText: 'border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,.3);',
+          formatter: function(params) {
+            if (!params.length) return '';
+            const idx = params[0].dataIndex;
+            updatePanel({ ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp }, idx, dates);
+
+            let html = `<div style="font-weight:700; margin-bottom:6px; color:#E9D8A6; font-size:12px">${fdate(dates[idx])}</div>`;
+            params.forEach(p => {
+              if (p.value == null || p.seriesName === 'Ref 0%') return;
+              html += `<div style="display:flex; align-items:center; gap:8px; margin:3px 0">
+                <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>
+                <span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span>
+                <span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${view.fmt(p.value)}</span>
+              </div>`;
+            });
+            return html;
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: dates,
+          axisLine: { lineStyle: { color: dk ? '#2A3A50' : '#E2DDD3' } },
+          axisTick: { show: false },
+          axisLabel: {
+            fontFamily: 'Inter',
+            fontSize: 10,
+            fontWeight: 500,
+            color: dk ? '#64748B' : '#94A3B8',
+            formatter: function(v, idx) {
+              const total = dates.length;
+              if (idx === 0 || idx === total - 1) return fdate(v);
+              const step = Math.max(1, Math.round(total / 8));
+              if (idx % step === 0) return fdate(v);
+              return '';
+            },
+            showMinLabel: true,
+            showMaxLabel: true,
+          }
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: { lineStyle: { color: dk ? '#1E1E1E' : '#F1F5F9', type: 'dashed' } },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            fontFamily: 'JetBrains Mono',
+            fontSize: 11,
+            color: dk ? '#64748B' : '#94A3B8',
+            formatter: v => view.yFmt(v)
+          }
+        },
+        series: seriesEch
+      };
+
+      chart.setOption(option, true);
+    }
+
+    function updatePanel(allSeries, dateIdx, datesArr) {
+      const view = VIEWS[curView];
+      let dates = datesArr;
+      if (!dates) {
+        dates = mergedDates(allSeries, curRange);
+      }
+      if (dateIdx < 0 || dateIdx >= dates.length) dateIdx = dates.length - 1;
+      curIdx = dateIdx;
+      const fecha = dates[dateIdx];
+      const prevFecha = dateIdx > 0 ? dates[dateIdx - 1] : null;
+
+      document.getElementById('panel-date').textContent = fdate(fecha);
+
+      const getVal = (arr, f, key) => {
+        const r = arr.find(x => x.fecha === f);
+        return r ? r[key] : null;
+      };
+
+      const blocks = [];
+      const dtClasses = { ipp: 'dt-blue', ipm: 'dt-amber', nac: 'dt-teal', imp: 'dt-red' };
+      const bgAlpha  = { ipp: 'rgba(37,99,235,.08)', ipm: 'rgba(217,119,6,.08)', nac: 'rgba(13,148,136,.08)', imp: 'rgba(199,30,29,.08)' };
+      const labels   = { ipp: 'IPP — Productor', ipm: 'IPM — General', nac: 'IPM — Nacional', imp: 'IPM — Importado' };
+      const descs    = {
+        ipp: 'Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
+        ipm: 'Variación de precios en el <strong>canal mayorista</strong>, incluyendo bienes nacionales e importados.',
+        nac: 'Componente de bienes de <strong>origen nacional</strong> del IPM. Refleja presiones internas de la cadena productiva.',
+        imp: 'Componente de bienes <strong>importados</strong> del IPM. Sensible al tipo de cambio paralelo y costos de internación.'
+      };
+
+      SERIES_CFG.forEach(s => {
+        if (!active.has(s.key)) return;
+        const arr = allSeries[s.key];
+        const val = getVal(arr, fecha, view.key);
+        const prevVal = prevFecha ? getVal(arr, prevFecha, view.key) : null;
+        const delta = (val != null && prevVal != null) ? val - prevVal : null;
+
+        blocks.push(`
+          <div class="panel-block">
+            <div class="panel-label" style="color:${s.color}; background:${bgAlpha[s.key]}; border-left-color:${s.color}">${labels[s.key]}</div>
+            <div class="panel-val" style="color:${s.color}">${val != null ? view.fmt(val) : '—'}</div>
+            <p class="panel-desc">${descs[s.key]}${delta != null ? ` Cambio: <span class="delta-tag ${dtClasses[s.key]}">${(delta >= 0 ? '+' : '') + delta.toFixed(1)} pp</span>` : ''}</p>
+          </div>
+        `);
+      });
+
+      const ippV = getVal(allSeries.ipp, fecha, 'var_12_meses');
+      const ipmV = getVal(allSeries.ipm, fecha, 'var_12_meses');
+      const nacV = getVal(allSeries.nac, fecha, 'var_12_meses');
+      const impV = getVal(allSeries.imp, fecha, 'var_12_meses');
+
+      let analysis = '';
+      if (view.key === 'var_12_meses' && ippV != null && ipmV != null) {
+        const maxV = Math.max(ippV, ipmV);
+        const diff = Math.abs(ippV - ipmV).toFixed(1);
+        const impNacDiff = (impV != null && nacV != null) ? (impV - nacV).toFixed(1) : null;
+
+        if (maxV > 20) {
+          analysis = `<strong>Presiones inflacionarias severas en la cadena productiva.</strong> IPP en <span class="delta-tag dt-blue">${fpct(ippV)}</span> e IPM en <span class="delta-tag dt-amber">${fpct(ipmV)}</span> — la brecha de ${diff} pp indica ${ippV > ipmV ? 'que el canal mayorista absorbe parte del impacto' : 'que los costos de distribución e importación amplifican las presiones'}.${impNacDiff ? ` La diferencia importado-nacional de <span class="delta-tag dt-red">${impNacDiff} pp</span> refleja ${impV > nacV ? 'el peso del tipo de cambio paralelo sobre insumos importados' : 'que las presiones son mayormente de origen interno'}.` : ''}`;
+        } else if (maxV > 10) {
+          analysis = `<strong>Presiones significativas en precios de producción y distribución.</strong> Con el IPP en <span class="delta-tag dt-blue">${fpct(ippV)}</span> y el IPM en <span class="delta-tag dt-amber">${fpct(ipmV)}</span>, la diferencia de ${diff} pp sugiere ${ippV > ipmV ? 'que los intermediarios absorben parte del alza' : 'presiones adicionales en la distribución mayorista'}.`;
+        } else if (maxV > 4) {
+          analysis = `<strong>Presiones moderadas en la cadena de precios.</strong> IPP (+${ippV.toFixed(1)}%) e IPM (+${ipmV.toFixed(1)}%) muestran variaciones por encima del rango de estabilidad. La brecha de ${diff} pp indica ${ippV > ipmV ? 'absorción parcial por intermediarios' : 'márgenes de distribución que amplifican el alza'}.`;
+        } else {
+          analysis = `<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en ${fpct(ippV)} e IPM en ${fpct(ipmV)} sugieren presiones contenidas a lo largo de la cadena de precios.`;
+        }
+      } else if (view.key === 'var_mensual') {
+        const vals = [ippV, ipmV].filter(v => v != null);
+        if (vals.length) {
+          const maxM = Math.max(...[getVal(allSeries.ipp, fecha, 'var_mensual'), getVal(allSeries.ipm, fecha, 'var_mensual')].filter(v => v != null));
+          analysis = maxM > 1
+            ? `Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>${fdate(fecha)}</strong>.`
+            : maxM > 0
+            ? `Variación mensual positiva moderada en <strong>${fdate(fecha)}</strong>. Las presiones se acumulan mes a mes en la cadena de precios.`
+            : `Variación mensual negativa en <strong>${fdate(fecha)}</strong> — alivio temporal en costos, posiblemente estacional.`;
+        } else {
+          analysis = 'Datos no disponibles para este período.';
+        }
+      } else {
+        const ippIdx = getVal(allSeries.ipp, fecha, 'indice');
+        analysis = ippIdx != null
+          ? `El índice base 2016=100 muestra cuánto han cambiado los precios desde el año de referencia. Un valor de <span class="delta-tag dt-blue">${ippIdx.toFixed(0)}</span> implica un aumento acumulado de <strong>${(ippIdx - 100).toFixed(0)}%</strong> desde 2016 en precios al productor.`
+          : 'Seleccione un punto del gráfico para ver el análisis.';
+      }
+
+      document.getElementById('panel-body').innerHTML = blocks.join('') +
+        `<div class="ctx-box"><p>${analysis}</p></div>`;
+    }
+
+    function buildEduBoxes() {
+      const lastIPP = ippData[ippData.length - 1] || {};
+      const lastIPM = ipmGen[ipmGen.length - 1] || {};
+      const lastNac = ipmNac[ipmNac.length - 1] || {};
+      const lastImp = ipmImp[ipmImp.length - 1] || {};
+
+      const eduData = [
+        {
+          title: '¿Qué son el IPP y el IPM?',
+          content: `<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>
+          <p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>`
+        },
+        {
+          title: '¿Cómo se relacionan IPP, IPM e IPC?',
+          content: `<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>
+          <p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución.</p>`
+        },
+        {
+          title: 'IPM Nacional vs. Importado',
+          content: `<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria, los bienes importados reflejan el tipo de cambio paralelo, no el oficial. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>
+          <p>Actualmente el componente importado registra <span class="highlight hl-red">${lastImp.var_12_meses != null ? fpct(lastImp.var_12_meses) : '—'}</span> interanual vs. <span class="highlight hl-teal">${lastNac.var_12_meses != null ? fpct(lastNac.var_12_meses) : '—'}</span> del nacional — ${lastImp.var_12_meses > lastNac.var_12_meses ? 'la presión cambiaria encarece significativamente los bienes importados' : 'las presiones son mayormente de origen interno'}.</p>`
+        },
+        {
+          title: '¿Qué significa base 2016=100?',
+          content: `<p>Ambos índices usan <strong>2016 como año base</strong> (=100). Esto significa que un índice de <span class="highlight hl-blue">${lastIPP.indice != null ? lastIPP.indice.toFixed(0) : '—'}</span> indica que los precios al productor han subido <strong>${lastIPP.indice != null ? (lastIPP.indice - 100).toFixed(0) : '—'}%</strong> desde 2016. La metodología es <strong>Laspeyres</strong>, que mide el cambio de precios manteniendo fija la canasta de productos del año base.</p>
+          <p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>`
+        }
+      ];
+
+      document.getElementById('edu-boxes').innerHTML = eduData.map(e => `
+        <div class="edu-box" onclick="this.classList.toggle('open')">
+          <div class="edu-box-toggle">
+            <span class="edu-box-title">${e.title}</span>
+            <span class="edu-box-arrow">&#9660;</span>
+          </div>
+          <div class="edu-box-content">${e.content}</div>
+        </div>
+      `).join('');
+    }
+
+    init().then(() => buildEduBoxes());
+  })();
+  </script>
 </body>
 </html>
