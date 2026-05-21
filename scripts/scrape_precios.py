@@ -7,7 +7,7 @@ Base 2016=100
 Descarga los Excel del INE y genera JSON estandarizado para el dashboard y embeds.
 """
 
-import json, os, sys
+import json, os, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,22 +44,32 @@ IPP_PONDERACIONES = {
 # ── Descarga ───────────────────────────────────────────────────────────────────
 
 def download_all():
-    """Descarga todos los Excel del INE."""
+    """Descarga todos los Excel del INE con reintentos."""
     import urllib.request, ssl
     ctx = ssl.create_default_context()
     DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+    max_retries = 3
+    retry_delays = [10, 30, 60]
+
     for name, url in SOURCES.items():
         dest = DOWNLOAD_DIR / f"{name}.xlsx"
         print(f"  Descargando {name}...")
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
-                dest.write_bytes(resp.read())
-            print(f"    ✓ {dest.stat().st_size / 1024:.0f} KB")
-        except Exception as e:
-            print(f"    ✗ Error: {e}")
-            sys.exit(1)
+        for attempt in range(max_retries):
+            try:
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, context=ctx, timeout=90) as resp:
+                    dest.write_bytes(resp.read())
+                print(f"    ✓ {dest.stat().st_size / 1024:.0f} KB")
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    delay = retry_delays[attempt]
+                    print(f"    ✗ Intento {attempt + 1}/{max_retries}: {e} — reintentando en {delay}s...")
+                    time.sleep(delay)
+                else:
+                    print(f"    ✗ Error tras {max_retries} intentos: {e}")
+                    sys.exit(1)
 
 
 # ── Parsers ────────────────────────────────────────────────────────────────────
