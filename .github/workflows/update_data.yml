@@ -2,8 +2,7 @@ name: Actualizar datos IPP/IPM
 
 on:
   schedule:
-    # INE publica ~día 15 de cada mes. Scrapeamos días 16, 18 y 20 para capturar.
-    - cron: '0 15 16,18,20 * *'  # 11:00 BOT (UTC-4)
+    - cron: '0 15 16,18,20 * *'
   workflow_dispatch:
 
 jobs:
@@ -36,3 +35,10 @@ jobs:
             git commit -m "datos: IPP/IPM $(date +%Y-%m-%d)"
             git push
           fi
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=populi-precios-productor
