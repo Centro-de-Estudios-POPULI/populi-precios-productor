@@ -18,13 +18,17 @@ import openpyxl
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DOWNLOAD_DIR = Path(__file__).resolve().parent / "downloads"
 
+# NOTA: el INE rota periódicamente estos share links (host nube/nimbus + ID).
+# Si el scraper deja de traer meses nuevos, revisar y actualizar estos enlaces
+# desde https://www.ine.gob.bo/index.php/cuadros-estadisticos-ipp/ y .../ipm/
+# Última verificación de enlaces: 2026-06-23
 SOURCES = {
-    "ipp_general":     "https://nimbus.ine.gob.bo/index.php/s/FnaNZKZDQaLnx67/download",
-    "ipp_grupos":      "https://nimbus.ine.gob.bo/index.php/s/72y3pKyqz3jpsiz/download",
-    "ipm_general":     "https://nube.ine.gob.bo/index.php/s/P9UVmZFFZcnjRmJ/download",
-    "ipm_nacional":    "https://nube.ine.gob.bo/index.php/s/dc7Y8lQI8gLeHag/download",
-    "ipm_importado":   "https://nube.ine.gob.bo/index.php/s/HE8NmTzd1lJYemL/download",
-    "ipm_origen_grupo":"https://nube.ine.gob.bo/index.php/s/ZxpNrVFIhHBbJsK/download",
+    "ipp_general":     "https://nube.ine.gob.bo/index.php/s/jiPDzh0nsOiDGY0/download",
+    "ipp_grupos":      "https://nube.ine.gob.bo/index.php/s/RbTQhRDB6bpuPWx/download",
+    "ipm_general":     "https://nube.ine.gob.bo/index.php/s/woA93UUgzbGqzDC/download",
+    "ipm_nacional":    "https://nube.ine.gob.bo/index.php/s/WkIa9YYkgWogcJr/download",
+    "ipm_importado":   "https://nube.ine.gob.bo/index.php/s/DOBUlEcw9yiLYgt/download",
+    "ipm_origen_grupo":"https://nube.ine.gob.bo/index.php/s/xLG383UFEOlt8Lv/download",
 }
 
 MESES = {
