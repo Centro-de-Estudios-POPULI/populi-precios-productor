@@ -7,7 +7,7 @@ Base 2016=100
 Descarga los Excel del INE y genera JSON estandarizado para el dashboard y embeds.
 """
 
-import json, os, sys, time
+import json, os, re, sys, time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -18,17 +18,22 @@ import openpyxl
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DOWNLOAD_DIR = Path(__file__).resolve().parent / "downloads"
 
-# NOTA: el INE rota periódicamente estos share links (host nube/nimbus + ID).
-# Si el scraper deja de traer meses nuevos, revisar y actualizar estos enlaces
-# desde https://www.ine.gob.bo/index.php/cuadros-estadisticos-ipp/ y .../ipm/
-# Última verificación de enlaces: 2026-06-23
-SOURCES = {
-    "ipp_general":     "https://nube.ine.gob.bo/index.php/s/jiPDzh0nsOiDGY0/download",
-    "ipp_grupos":      "https://nube.ine.gob.bo/index.php/s/RbTQhRDB6bpuPWx/download",
-    "ipm_general":     "https://nube.ine.gob.bo/index.php/s/woA93UUgzbGqzDC/download",
-    "ipm_nacional":    "https://nube.ine.gob.bo/index.php/s/WkIa9YYkgWogcJr/download",
-    "ipm_importado":   "https://nube.ine.gob.bo/index.php/s/DOBUlEcw9yiLYgt/download",
-    "ipm_origen_grupo":"https://nube.ine.gob.bo/index.php/s/xLG383UFEOlt8Lv/download",
+# Páginas del INE desde donde se RESUELVEN dinámicamente los enlaces de descarga.
+# El INE rota los share links (host nube/nimbus + ID) con cada publicación, por eso
+# se leen de la página en cada corrida (ver resolver_fuentes). Los enlaces de abajo
+# son solo el FALLBACK si el parseo de la página falla. Última verif.: 2026-06-23
+PAGINA_IPP = "https://www.ine.gob.bo/index.php/cuadros-estadisticos-ipp/"
+PAGINA_IPM = "https://www.ine.gob.bo/index.php/cuadros-estadisticos-ipm/"
+
+FUENTES_IPP = {
+    "ipp_general": "https://nube.ine.gob.bo/index.php/s/jiPDzh0nsOiDGY0/download",
+    "ipp_grupos":  "https://nube.ine.gob.bo/index.php/s/RbTQhRDB6bpuPWx/download",
+}
+FUENTES_IPM = {
+    "ipm_general":      "https://nube.ine.gob.bo/index.php/s/woA93UUgzbGqzDC/download",
+    "ipm_nacional":     "https://nube.ine.gob.bo/index.php/s/WkIa9YYkgWogcJr/download",
+    "ipm_importado":    "https://nube.ine.gob.bo/index.php/s/DOBUlEcw9yiLYgt/download",
+    "ipm_origen_grupo": "https://nube.ine.gob.bo/index.php/s/xLG383UFEOlt8Lv/download",
 }
 
 MESES = {
@@ -45,9 +50,87 @@ IPP_PONDERACIONES = {
     "Servicios": 37.02,
 }
 
+# ── Resolución dinámica de enlaces del INE ──────────────────────────────────────
+
+def _sin_acentos(t: str) -> str:
+    t = t.lower()
+    for a, b in (("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u")):
+        t = t.replace(a, b)
+    return t
+
+
+def _extraer_links(html: str) -> list:
+    """Devuelve [(texto_normalizado, url), ...] de los anchors a nube/nimbus.ine.gob.bo."""
+    links = []
+    patron = r'<a[^>]+href="([^"]*(?:nube|nimbus)\.ine\.gob\.bo[^"]*)"[^>]*>(.*?)</a>'
+    for m in re.finditer(patron, html, re.I | re.S):
+        url = m.group(1).replace("&amp;", "&")
+        texto = re.sub(r"<[^>]+>", " ", m.group(2))
+        texto = _sin_acentos(re.sub(r"\s+", " ", texto).strip())
+        links.append((texto, url))
+    return links
+
+
+def _match(texto: str, key: str) -> bool:
+    """Mapea el texto de un enlace del INE a una clave de fuente (IPP/IPM)."""
+    t = texto
+    reglas = {
+        # IPP — página de cuadros del Índice de Precios Productor
+        "ipp_grupos":  "general" in t and "grupo" in t,
+        "ipp_general": "general" in t and "grupo" not in t,
+        # IPM — página de cuadros del Índice de Precios al por Mayor
+        "ipm_origen_grupo": "general" in t and "origen" in t and "grupo" in t,
+        "ipm_nacional":     "general" in t and "origen" in t and "nacional" in t,
+        "ipm_importado":    "general" in t and "origen" in t and "importado" in t,
+        "ipm_general":      "general" in t and "origen" not in t and "grupo" not in t,
+    }
+    return reglas.get(key, False)
+
+
+def _fetch_html(url: str) -> str:
+    import urllib.request, ssl
+    ctx = ssl.create_default_context()
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
+        return resp.read().decode("utf-8", errors="replace")
+
+
+def resolver_fuentes() -> dict:
+    """
+    Lee las páginas de cuadros del INE y resuelve los enlaces de descarga actuales
+    por el texto de cada enlace. Cae al enlace hardcodeado (fallback) si la página
+    no se puede leer o falta alguna clave. Devuelve {clave: url} para las 6 fuentes.
+    """
+    def resolver(pagina: str, fallback: dict) -> dict:
+        try:
+            links = _extraer_links(_fetch_html(pagina))
+        except Exception as e:
+            print(f"  [WARN] No se pudo leer {pagina}: {e} — usando fallback", file=sys.stderr)
+            return dict(fallback)
+        resuelto = {}
+        for texto, url in links:
+            for key in fallback:
+                if key not in resuelto and _match(texto, key):
+                    resuelto[key] = url
+                    break
+        for key, url in fallback.items():
+            if key not in resuelto:
+                print(f"  [WARN] '{key}' no encontrado en la página — usando fallback", file=sys.stderr)
+                resuelto[key] = url
+            else:
+                origen = "INE" if resuelto[key] != fallback[key] else "INE (=fallback)"
+                print(f"    · {key}: {origen}")
+        return resuelto
+
+    sources = {}
+    sources.update(resolver(PAGINA_IPP, FUENTES_IPP))
+    sources.update(resolver(PAGINA_IPM, FUENTES_IPM))
+    return sources
+
+
 # ── Descarga ───────────────────────────────────────────────────────────────────
 
-def download_all():
+def download_all(sources: dict):
     """Descarga todos los Excel del INE con reintentos."""
     import urllib.request, ssl
     ctx = ssl.create_default_context()
@@ -56,7 +139,7 @@ def download_all():
     max_retries = 3
     retry_delays = [10, 30, 60]
 
-    for name, url in SOURCES.items():
+    for name, url in sources.items():
         dest = DOWNLOAD_DIR / f"{name}.xlsx"
         print(f"  Descargando {name}...")
         for attempt in range(max_retries):
@@ -308,9 +391,11 @@ def main():
 
     print("═══ Scraper IPP/IPM — INE Bolivia ═══\n")
 
-    # 1. Descargar
-    print("1. Descargando Excel del INE...")
-    download_all()
+    # 1. Resolver enlaces actuales del INE (rotan con cada publicación) y descargar
+    print("1. Resolviendo enlaces del INE...")
+    sources = resolver_fuentes()
+    print("   Descargando Excel del INE...")
+    download_all(sources)
 
     # 2. Procesar IPP
     print("\n2. Procesando IPP...")
