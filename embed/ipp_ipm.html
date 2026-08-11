@@ -11,10 +11,10 @@
   <style>
     /* ── Variables — Tema Claro (Populi Website) ─────────────────── */
     :root {
-      --populi:       #8B1A1A;
+      --populi:       #C71E1D;
       --populi-dark:  #6B0300;
-      --populi-light: #C00000;
-      --populi-gold:  #D4A017;
+      --populi-light: #E8706B;
+      --populi-gold:  #EE9B00;
       --cream:        #F5EFE0;
       --brown:        #5C3D1E;
       --brown-dark:   #3D2B1F;
@@ -33,9 +33,9 @@
       --text2: var(--slate);
       --muted: var(--slate-light);
 
-      --ct-ipp:  #2563EB;
-      --ct-ipm:  #D97706;
-      --ct-nac:  #0D9488;
+      --ct-ipp:  #005F73;
+      --ct-ipm:  #EE9B00;
+      --ct-nac:  #0A9396;
       --ct-imp:  #C71E1D;
 
       --shadow: 0 1px 3px rgba(13,27,42,.04), 0 4px 16px rgba(13,27,42,.06);
@@ -169,7 +169,7 @@
       margin-top: 5px;
     }
     .kpi-delta.up { background: rgba(199,30,29,.08); color: #C71E1D; }
-    .kpi-delta.down { background: rgba(5,150,105,.08); color: #059669; }
+    .kpi-delta.down { background: rgba(5,150,105,.08); color: #0A9396; }
     .kpi-delta.flat { background: rgba(100,116,139,.08); color: #64748B; }
     [data-theme="dark"] .kpi-delta.up { background: rgba(199,30,29,.15); }
     [data-theme="dark"] .kpi-delta.down { background: rgba(5,150,105,.15); }
@@ -393,9 +393,9 @@
       font-size: 0.82em;
       white-space: nowrap;
     }
-    .dt-blue   { background: rgba(37,99,235,.08);  color: #2563EB; }
-    .dt-amber  { background: rgba(217,119,6,.08);  color: #D97706; }
-    .dt-teal   { background: rgba(13,148,136,.08);  color: #0D9488; }
+    .dt-blue   { background: rgba(37,99,235,.08);  color: #005F73; }
+    .dt-amber  { background: rgba(217,119,6,.08);  color: #EE9B00; }
+    .dt-teal   { background: rgba(13,148,136,.08);  color: #0A9396; }
     .dt-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
 
     /* ── Context Analysis ─────────────────────────────────────────── */
@@ -471,9 +471,9 @@
       padding: 0 4px;
       border-radius: 3px;
     }
-    .hl-blue   { background: rgba(37,99,235,.08);  color: #2563EB; }
-    .hl-amber  { background: rgba(217,119,6,.08);  color: #D97706; }
-    .hl-teal   { background: rgba(13,148,136,.08);  color: #0D9488; }
+    .hl-blue   { background: rgba(37,99,235,.08);  color: #005F73; }
+    .hl-amber  { background: rgba(217,119,6,.08);  color: #EE9B00; }
+    .hl-teal   { background: rgba(13,148,136,.08);  color: #0A9396; }
     .hl-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
 
     /* ── Ampliar Button ──────────────────────────────────────────── */
@@ -576,9 +576,9 @@
     }
 
     const SERIES_CFG = [
-      { key: 'ipp',  label: 'IPP',          color: '#2563EB', dashed: false },
-      { key: 'ipm',  label: 'IPM General',   color: '#D97706', dashed: false },
-      { key: 'nac',  label: 'IPM Nacional',   color: '#0D9488', dashed: true },
+      { key: 'ipp',  label: 'IPP',          color: '#005F73', dashed: false },
+      { key: 'ipm',  label: 'IPM General',   color: '#EE9B00', dashed: false },
+      { key: 'nac',  label: 'IPM Nacional',   color: '#0A9396', dashed: true },
       { key: 'imp',  label: 'IPM Importado',  color: '#C71E1D', dashed: true },
     ];
 
@@ -677,7 +677,7 @@
                 Elaboración: <a href="https://populi.org.bo" target="_blank">Centro de Estudios POPULI</a>
               </span>
               <svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" class="watermark">
-                <text x="6" y="112" font-family="'Playfair Display', Georgia, serif" font-size="145" font-weight="700" fill="${dk ? '#C00000' : '#8B1A1A'}">P</text>
+                <text x="6" y="112" font-family="'Playfair Display', Georgia, serif" font-size="145" font-weight="700" fill="${dk ? '#E8706B' : '#C71E1D'}">P</text>
                 <text x="92" y="87" font-family="'Playfair Display', Georgia, serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" fill="${dk ? '#F5EFE0' : '#3D2B1F'}">opuli</text>
               </svg>
             </div>

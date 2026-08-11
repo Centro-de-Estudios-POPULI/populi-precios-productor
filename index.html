@@ -11,9 +11,9 @@
   <style>
     /* ── Variables — Tema Claro ─────────────────────────────────── */
     :root {
-      --populi:      #8B1A1A;
+      --populi:      #C71E1D;
       --populi-dark: #6B0300;
-      --populi-light:#C00000;
+      --populi-light:#E8706B;
       --cream:       #F5EFE0;
       --navy:        #0D1B2A;
       --navy-light:  #1A2940;
@@ -30,9 +30,9 @@
       --muted:   #6B7A8D;
       --muted2:  #9AACBA;
 
-      --ct-ipp:  #2563EB;
-      --ct-ipm:  #D97706;
-      --ct-nac:  #0D9488;
+      --ct-ipp:  #005F73;
+      --ct-ipm:  #EE9B00;
+      --ct-nac:  #0A9396;
       --ct-imp:  #C71E1D;
 
       --shadow:    0 1px 3px rgba(0,18,25,.05), 0 4px 18px rgba(0,18,25,.06);
@@ -120,14 +120,14 @@
     .kpi-card.ipm{border-left-color:var(--ct-ipm)}
     .kpi-card.nac{border-left-color:var(--ct-nac)}
     .kpi-card.imp{border-left-color:var(--ct-imp)}
-    .kpi-card.brecha{border-left-color:#8B5CF6}
-    .kpi-card.grupo{border-left-color:#EC4899}
+    .kpi-card.brecha{border-left-color:#9B2226}
+    .kpi-card.grupo{border-left-color:#DF5D25}
     .kpi-label{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
     .kpi-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--text);line-height:1.1;margin-top:5px;letter-spacing:-.5px}
     .kpi-sub{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.45}
     .kpi-delta{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:3px}
     .kpi-delta.up{color:#C71E1D}
-    .kpi-delta.down{color:#0D9488}
+    .kpi-delta.down{color:#0A9396}
     .kpi-delta.flat{color:var(--muted)}
 
     /* ── Context Stats ─────────────────────────────────────────── */
@@ -136,7 +136,7 @@
     .ctx-stat.warn{border-left-color:var(--ct-imp)}
     .ctx-stat.ok{border-left-color:var(--ct-nac)}
     .ctx-stat.info{border-left-color:var(--ct-ipp)}
-    .ctx-stat.alert{border-left-color:#8B5CF6}
+    .ctx-stat.alert{border-left-color:#9B2226}
     .ctx-label{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
     .ctx-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--text);line-height:1.2}
     .ctx-desc{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5}
@@ -199,7 +199,7 @@
     tbody td{padding:10px 14px;font-size:12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-weight:500}
     tbody td:first-child{font-family:'Inter',sans-serif;font-weight:600;color:var(--text2)}
     tbody td:not(:first-child){text-align:right}
-    .td-up{color:#C71E1D} .td-down{color:#0D9488}
+    .td-up{color:#C71E1D} .td-down{color:#0A9396}
 
     /* ── Methodology ───────────────────────────────────────────── */
     .method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
@@ -350,8 +350,8 @@
 <script>
 (function(){
   const BASE='https://centro-de-estudios-populi.github.io/populi-precios-productor/data/';
-  const C={ipp:'#2563EB',ipm:'#D97706',nac:'#0D9488',imp:'#C71E1D'};
-  const GRP_COLORS=['#2563EB','#D97706','#0D9488','#C71E1D','#8B5CF6','#EC4899'];
+  const C={ipp:'#005F73',ipm:'#EE9B00',nac:'#0A9396',imp:'#C71E1D'};
+  const GRP_COLORS=['#005F73','#EE9B00','#0A9396','#C71E1D','#9B2226','#DF5D25'];
 
   function isDark(){return document.documentElement.dataset.theme==='dark'}
   function fpct(v){return(v>=0?'+':'')+v.toFixed(1)+'%'}
