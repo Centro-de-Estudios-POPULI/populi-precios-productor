@@ -107,7 +107,7 @@
     .container{max-width:1320px;margin:auto;padding:32px 24px 60px}
     .section{margin-bottom:48px}
     .section-header{margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
-    .section-num{font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--ct-ipp);border:1.5px solid rgba(37,99,235,.25);padding:2px 7px;border-radius:20px;margin-top:3px;flex-shrink:0}
+    .section-num{font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--ct-ipp);border:1.5px solid rgba(0,95,115,.25);padding:2px 7px;border-radius:20px;margin-top:3px;flex-shrink:0}
     .section-titles h2{font-size:15.5px;font-weight:700;color:var(--text);letter-spacing:-.15px}
     .section-titles p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55}
 
@@ -171,7 +171,7 @@
     .toggle-pill .line-prev.dashed{border-top-style:dashed}
     .range-btns,.view-btns{display:flex;gap:4px}
     .rbtn,.vbtn{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .14s}
-    .rbtn:hover{border-color:var(--ct-ipp);color:var(--ct-ipp);background:rgba(37,99,235,.06)}
+    .rbtn:hover{border-color:var(--ct-ipp);color:var(--ct-ipp);background:rgba(0,95,115,.06)}
     .rbtn.active{background:var(--ct-ipp);border-color:var(--ct-ipp);color:#fff}
     .vbtn:hover{border-color:var(--ct-ipm);color:var(--ct-ipm)}
     .vbtn.active{background:var(--ct-ipm);border-color:var(--ct-ipm);color:#fff}
@@ -653,9 +653,9 @@
         if(!s2Active.has(s.key))return;
         const map=Object.fromEntries(s.data.map(r=>[r.fecha,r]));
         se.push({name:s.label,type:'line',data:dates.map(f=>map[f]?map[f][view.key]:null),symbol:'none',smooth:.15,lineStyle:{width:2.5,type:s.dashed?[6,4]:'solid',color:s.color},itemStyle:{color:s.color},connectNulls:true,
-          areaStyle:s.key==='ipp'?{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:dk?'rgba(37,99,235,.15)':'rgba(37,99,235,.08)'},{offset:1,color:'transparent'}])}:undefined});
+          areaStyle:s.key==='ipp'?{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:dk?'rgba(0,95,115,.15)':'rgba(0,95,115,.08)'},{offset:1,color:'transparent'}])}:undefined});
       });
-      if(view.isVar)se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#CBD5E1',type:[5,4]},itemStyle:{color:dk?'#333':'#CBD5E1'},z:0});
+      if(view.isVar)se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#E2DDD3',type:[5,4]},itemStyle:{color:dk?'#333':'#E2DDD3'},z:0});
 
       chart2.setOption({
         color:SERIES.filter(s=>s2Active.has(s.key)).map(s=>s.color),backgroundColor:'transparent',
@@ -663,7 +663,7 @@
         tooltip:{trigger:'axis',confine:true,backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:mob?11:12,color:'#fff'},padding:mob?[8,10]:[12,16],extraCssText:'border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);max-width:90vw;',
           formatter:params=>{if(!params.length)return'';let h=`<div style="font-weight:700;margin-bottom:6px;color:#E9D8A6;font-size:12px">${fdate(dates[params[0].dataIndex])}</div>`;params.forEach(p=>{if(p.value==null||p.seriesName==='Ref')return;h+=`<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span><span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span><span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${view.fmt(p.value)}</span></div>`});return h}},
         xAxis:{type:'category',data:dates,axisLine:{lineStyle:{color:dk?'#222':'#DDE3EA'}},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:(v,i)=>{if(i===0||i===dates.length-1)return fdate(v);const step=Math.max(1,Math.round(dates.length/8));return i%step===0?fdate(v):''}}},
-        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>view.yFmt(v)}},
+        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#141414':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>view.yFmt(v)}},
         series:se
       },true);
     }
@@ -680,7 +680,7 @@
         tooltip:{trigger:'axis',confine:true,axisPointer:{type:'shadow'},backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:12,color:'#fff'},extraCssText:'border-radius:8px;',
           formatter:p=>p[0]?`<div style="font-weight:700;margin-bottom:4px">${p[0].name}</div><div>Var. interanual: <b>${fpct(p[0].value)}</b></div><div style="font-size:11px;color:rgba(255,255,255,.5)">Ponderación: ${g.find(x=>x.name===p[0].name)?.pond}%</div>`:''
         },
-        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#141414':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
         yAxis:{type:'category',data:g.map(x=>x.name),axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:mob?9:11,fontWeight:600,color:dk?'#A0A0A0':'#364555',width:mob?80:135,overflow:'truncate'}},
         series:[{type:'bar',data:g.map((x,i)=>({value:x.v12,itemStyle:{color:GRP_COLORS[i],borderRadius:[0,4,4,0]}})),barWidth:16,label:{show:true,position:'right',fontFamily:'JetBrains Mono',fontSize:10,fontWeight:600,formatter:p=>fpct(p.value),color:dk?'#A0A0A0':'#364555'}}]
       },true);
@@ -698,7 +698,7 @@
         tooltip:{trigger:'axis',confine:true,axisPointer:{type:'shadow'},backgroundColor:dk?'#080808':'rgba(13,27,42,.96)',borderColor:dk?'#2A3A50':'#1A2940',textStyle:{fontFamily:'Inter',fontSize:12,color:'#fff'},extraCssText:'border-radius:8px;',
           formatter:p=>p[0]?`<div style="font-weight:700;margin-bottom:4px">${p[0].name}</div><div>Var. interanual: <b>${fpct(p[0].value)}</b></div>`:''
         },
-        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        xAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#141414':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
         yAxis:{type:'category',data:cats.map(c=>c.name),axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:mob?9:11,fontWeight:600,color:dk?'#A0A0A0':'#364555',width:mob?90:160,overflow:'truncate'}},
         series:[{type:'bar',data:cats.map(c=>({value:c.val,itemStyle:{color:c.isNac?C.nac:C.imp,borderRadius:[0,4,4,0]}})),barWidth:16,label:{show:true,position:'right',fontFamily:'JetBrains Mono',fontSize:10,fontWeight:600,formatter:p=>fpct(p.value),color:dk?'#A0A0A0':'#364555'}}]
       },true);
@@ -716,7 +716,7 @@
       const ds=new Set();ippGrupos.forEach(g=>{(m?g.series.slice(-m):g.series).forEach(r=>ds.add(r.fecha))});
       const dates=[...ds].sort();
       const se=ippGrupos.map((g,gi)=>{const map=Object.fromEntries(g.series.map(r=>[r.fecha,r]));return{name:g.grupo,type:'line',symbol:'none',smooth:.15,data:dates.map(f=>map[f]?map[f].var_12_meses:null),lineStyle:{width:2,color:GRP_COLORS[gi]},itemStyle:{color:GRP_COLORS[gi]},connectNulls:true}});
-      se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#CBD5E1',type:[5,4]},itemStyle:{color:dk?'#333':'#CBD5E1'},z:0});
+      se.push({name:'Ref',type:'line',data:dates.map(()=>0),symbol:'none',lineStyle:{width:1.2,color:dk?'#333':'#E2DDD3',type:[5,4]},itemStyle:{color:dk?'#333':'#E2DDD3'},z:0});
       chartE.setOption({
         color:GRP_COLORS,backgroundColor:'transparent',grid:{top:mob?60:40,right:16,bottom:40,left:mob?40:55},
         legend:{top:0,left:'center',textStyle:{fontFamily:'Inter',fontSize:mob?9:11,color:dk?'#A0A0A0':'#6B7A8D'},itemWidth:mob?12:16,itemHeight:3,itemGap:mob?8:16},
@@ -724,7 +724,7 @@
           formatter:params=>{if(!params.length)return'';let h=`<div style="font-weight:700;margin-bottom:6px;color:#E9D8A6">${fdate(dates[params[0].dataIndex])}</div>`;params.filter(p=>p.seriesName!=='Ref'&&p.value!=null).sort((a,b)=>b.value-a.value).forEach(p=>{h+=`<div style="display:flex;align-items:center;gap:8px;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span><span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span><span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${fpct(p.value)}</span></div>`});return h}
         },
         xAxis:{type:'category',data:dates,axisLine:{lineStyle:{color:dk?'#222':'#DDE3EA'}},axisTick:{show:false},axisLabel:{fontFamily:'Inter',fontSize:10,color:dk?'#5A5A5A':'#9AACBA',formatter:(v,i)=>{if(i===0||i===dates.length-1)return fdate(v);const step=Math.max(1,Math.round(dates.length/8));return i%step===0?fdate(v):''}}},
-        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#1E1E1E':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
+        yAxis:{type:'value',splitLine:{lineStyle:{color:dk?'#141414':'#F1F5F9',type:'dashed'}},axisLine:{show:false},axisTick:{show:false},axisLabel:{fontFamily:'JetBrains Mono',fontSize:11,color:dk?'#5A5A5A':'#9AACBA',formatter:v=>fpct(v)}},
         series:se
       },true);
     }

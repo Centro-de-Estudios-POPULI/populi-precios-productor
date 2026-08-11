@@ -47,7 +47,7 @@
       --bg:          #080808;
       --card:        #141414;
       --text:        #E2E8F0;
-      --text2:       #94A3B8;
+      --text2:       #64748B;
       --muted:       #64748B;
       --border:      #2A3A50;
       --light-gray:  #1A1A1A;
@@ -169,10 +169,10 @@
       margin-top: 5px;
     }
     .kpi-delta.up { background: rgba(199,30,29,.08); color: #C71E1D; }
-    .kpi-delta.down { background: rgba(5,150,105,.08); color: #0A9396; }
+    .kpi-delta.down { background: rgba(10,147,150,.08); color: #0A9396; }
     .kpi-delta.flat { background: rgba(100,116,139,.08); color: #64748B; }
     [data-theme="dark"] .kpi-delta.up { background: rgba(199,30,29,.15); }
-    [data-theme="dark"] .kpi-delta.down { background: rgba(5,150,105,.15); }
+    [data-theme="dark"] .kpi-delta.down { background: rgba(10,147,150,.15); }
 
     /* ── Main Grid: Chart + Panel ────────────────────────────────── */
     .main-grid {
@@ -273,7 +273,7 @@
       color: var(--muted);
       transition: all .2s;
     }
-    [data-theme="dark"] .range-btn { border-color: var(--dark-border); color: #94A3B8; }
+    [data-theme="dark"] .range-btn { border-color: var(--dark-border); color: #64748B; }
     .range-btn:hover, .range-btn.active {
       border-color: var(--populi);
       color: var(--populi);
@@ -393,9 +393,9 @@
       font-size: 0.82em;
       white-space: nowrap;
     }
-    .dt-blue   { background: rgba(37,99,235,.08);  color: #005F73; }
-    .dt-amber  { background: rgba(217,119,6,.08);  color: #EE9B00; }
-    .dt-teal   { background: rgba(13,148,136,.08);  color: #0A9396; }
+    .dt-blue   { background: rgba(0,95,115,.08);  color: #005F73; }
+    .dt-amber  { background: rgba(238,155,0,.08);  color: #EE9B00; }
+    .dt-teal   { background: rgba(10,147,150,.08);  color: #0A9396; }
     .dt-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
 
     /* ── Context Analysis ─────────────────────────────────────────── */
@@ -412,7 +412,7 @@
       line-height: 1.55;
       color: var(--slate-light);
     }
-    [data-theme="dark"] .ctx-box p { color: #94A3B8; }
+    [data-theme="dark"] .ctx-box p { color: #64748B; }
     .ctx-box p strong { color: var(--navy); }
     [data-theme="dark"] .ctx-box p strong { color: #E2E8F0; }
 
@@ -460,7 +460,7 @@
       margin-bottom: 6px;
     }
     .edu-box-content p:last-child { margin-bottom: 0; }
-    [data-theme="dark"] .edu-box-content p { color: #94A3B8; }
+    [data-theme="dark"] .edu-box-content p { color: #64748B; }
     .edu-box-content p strong { color: var(--navy); }
     [data-theme="dark"] .edu-box-content p strong { color: #E2E8F0; }
     .edu-box-content .highlight {
@@ -471,9 +471,9 @@
       padding: 0 4px;
       border-radius: 3px;
     }
-    .hl-blue   { background: rgba(37,99,235,.08);  color: #005F73; }
-    .hl-amber  { background: rgba(217,119,6,.08);  color: #EE9B00; }
-    .hl-teal   { background: rgba(13,148,136,.08);  color: #0A9396; }
+    .hl-blue   { background: rgba(0,95,115,.08);  color: #005F73; }
+    .hl-amber  { background: rgba(238,155,0,.08);  color: #EE9B00; }
+    .hl-teal   { background: rgba(10,147,150,.08);  color: #0A9396; }
     .hl-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
 
     /* ── Ampliar Button ──────────────────────────────────────────── */
@@ -496,22 +496,22 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--populi);
-      background: rgba(139,26,26,.06);
-      border: 1.5px solid rgba(139,26,26,.15);
+      background: rgba(199,30,29,.06);
+      border: 1.5px solid rgba(199,30,29,.15);
       transition: all .2s;
       text-decoration: none;
       cursor: pointer;
     }
     [data-theme="dark"] .ampliar-btn {
-      background: rgba(192,0,0,.08);
-      border-color: rgba(192,0,0,.2);
+      background: rgba(232,112,107,.08);
+      border-color: rgba(232,112,107,.2);
       color: var(--populi-light);
     }
     .ampliar-btn:hover {
-      background: rgba(139,26,26,.12);
-      border-color: rgba(139,26,26,.3);
+      background: rgba(199,30,29,.12);
+      border-color: rgba(199,30,29,.3);
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(139,26,26,.1);
+      box-shadow: 0 2px 8px rgba(199,30,29,.1);
       text-decoration: none;
     }
     .ampliar-btn svg {
@@ -850,8 +850,8 @@
           areaStyle: (s.key === 'ipp' || s.key === 'ipm') ? {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               { offset: 0, color: s.key === 'ipp'
-                ? (dk ? 'rgba(37,99,235,.2)' : 'rgba(37,99,235,.1)')
-                : (dk ? 'rgba(217,119,6,.15)' : 'rgba(217,119,6,.08)') },
+                ? (dk ? 'rgba(0,95,115,.2)' : 'rgba(0,95,115,.1)')
+                : (dk ? 'rgba(238,155,0,.15)' : 'rgba(238,155,0,.08)') },
               { offset: 1, color: 'transparent' }
             ])
           } : undefined,
@@ -871,8 +871,8 @@
           type: 'line',
           data: dates.map(() => 0),
           symbol: 'none',
-          lineStyle: { width: 1.5, color: dk ? '#475569' : '#CBD5E1', type: [5, 4] },
-          itemStyle: { color: dk ? '#475569' : '#CBD5E1' },
+          lineStyle: { width: 1.5, color: dk ? '#475569' : '#E2DDD3', type: [5, 4] },
+          itemStyle: { color: dk ? '#475569' : '#E2DDD3' },
           z: 1
         });
       }
@@ -914,7 +914,7 @@
             fontFamily: 'Inter',
             fontSize: 10,
             fontWeight: 500,
-            color: dk ? '#64748B' : '#94A3B8',
+            color: dk ? '#64748B' : '#64748B',
             formatter: function(v, idx) {
               const total = dates.length;
               if (idx === 0 || idx === total - 1) return fdate(v);
@@ -928,13 +928,13 @@
         },
         yAxis: {
           type: 'value',
-          splitLine: { lineStyle: { color: dk ? '#1E1E1E' : '#F1F5F9', type: 'dashed' } },
+          splitLine: { lineStyle: { color: dk ? '#141414' : '#F1F5F9', type: 'dashed' } },
           axisLine: { show: false },
           axisTick: { show: false },
           axisLabel: {
             fontFamily: 'JetBrains Mono',
             fontSize: 11,
-            color: dk ? '#64748B' : '#94A3B8',
+            color: dk ? '#64748B' : '#64748B',
             formatter: v => view.yFmt(v)
           }
         },
@@ -964,7 +964,7 @@
 
       const blocks = [];
       const dtClasses = { ipp: 'dt-blue', ipm: 'dt-amber', nac: 'dt-teal', imp: 'dt-red' };
-      const bgAlpha  = { ipp: 'rgba(37,99,235,.08)', ipm: 'rgba(217,119,6,.08)', nac: 'rgba(13,148,136,.08)', imp: 'rgba(199,30,29,.08)' };
+      const bgAlpha  = { ipp: 'rgba(0,95,115,.08)', ipm: 'rgba(238,155,0,.08)', nac: 'rgba(10,147,150,.08)', imp: 'rgba(199,30,29,.08)' };
       const labels   = { ipp: 'IPP — Productor', ipm: 'IPM — General', nac: 'IPM — Nacional', imp: 'IPM — Importado' };
       const descs    = {
         ipp: 'Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
