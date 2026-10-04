@@ -1,1086 +1,253 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="light" style="--acento:#005F73">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPP e IPM · Populi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="comun/monitor.css" />
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-  <style>
-    /* ── Variables — Tema Claro (Populi Website) ─────────────────── */
-    :root {
-      --populi:       #C71E1D;
-      --populi-dark:  #6B0300;
-      --populi-light: #E8706B;
-      --populi-gold:  #EE9B00;
-      --cream:        #F5EFE0;
-      --brown:        #5C3D1E;
-      --brown-dark:   #3D2B1F;
-      --navy:         #0D1B2A;
-      --navy-light:   #1A2940;
-      --slate:        #475569;
-      --slate-light:  #64748B;
-      --warm-white:   #FAF8F3;
-      --light-gray:   #F1EDE5;
-      --border:       #E2DDD3;
-      --dark-border:  #2A3A50;
-
-      --bg:   var(--warm-white);
-      --card: #FFFFFF;
-      --text: var(--brown-dark);
-      --text2: var(--slate);
-      --muted: var(--slate-light);
-
-      --ct-ipp:  #005F73;
-      --ct-ipm:  #EE9B00;
-      --ct-nac:  #0A9396;
-      --ct-imp:  #C71E1D;
-
-      --shadow: 0 1px 3px rgba(13,27,42,.04), 0 4px 16px rgba(13,27,42,.06);
-      --radius: 12px;
-    }
-
-    /* ── Variables — Tema Oscuro ──────────────────────────────────── */
-    [data-theme="dark"] {
-      --bg:          #080808;
-      --card:        #141414;
-      --text:        #E2E8F0;
-      --text2:       #64748B;
-      --muted:       #64748B;
-      --border:      #2A3A50;
-      --light-gray:  #1A1A1A;
-      --cream:       #1A2940;
-      --shadow: 0 2px 8px rgba(0,0,0,.5), 0 6px 24px rgba(0,0,0,.4);
-    }
-
-    /* ── Reset ────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      padding: 0;
-      margin: 0;
-      transition: background .25s ease, color .25s ease;
-    }
-
-    .embed-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px 16px;
-    }
-
-    /* ── Section Header ──────────────────────────────────────────── */
-    .section-header {
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      line-height: 1.15;
-    }
-    [data-theme="dark"] .section-title { color: #fff; }
-    .section-title .accent-bar {
-      width: 4px;
-      height: 26px;
-      background: var(--ct-ipp);
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    .section-subtitle {
-      font-size: 0.78rem;
-      color: var(--muted);
-      padding-left: 14px;
-      margin-top: 2px;
-    }
-    [data-theme="dark"] .section-subtitle { color: rgba(255,255,255,.4); }
-
-    /* ── KPI Strip ───────────────────────────────────────────────── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 700px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .kpi-card {
-      background: var(--warm-white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      position: relative;
-      overflow: hidden;
-      cursor: default;
-      transition: transform .2s, box-shadow .2s;
-    }
-    [data-theme="dark"] .kpi-card {
-      background: #141414;
-      border-color: var(--dark-border);
-    }
-    .kpi-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0,0,0,.08);
-    }
-    .kpi-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 3px;
-    }
-    .kpi-card[data-s="ipp"]::after  { background: var(--ct-ipp); }
-    .kpi-card[data-s="ipm"]::after  { background: var(--ct-ipm); }
-    .kpi-card[data-s="nac"]::after  { background: var(--ct-nac); }
-    .kpi-card[data-s="imp"]::after  { background: var(--ct-imp); }
-    .kpi-label {
-      font-size: 0.62rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    [data-theme="dark"] .kpi-label { color: rgba(255,255,255,.4); }
-    .kpi-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-    .kpi-delta {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 1px 7px;
-      border-radius: 5px;
-      margin-top: 5px;
-    }
-    .kpi-delta.up { background: rgba(199,30,29,.08); color: #C71E1D; }
-    .kpi-delta.down { background: rgba(10,147,150,.08); color: #0A9396; }
-    .kpi-delta.flat { background: rgba(100,116,139,.08); color: #64748B; }
-    [data-theme="dark"] .kpi-delta.up { background: rgba(199,30,29,.15); }
-    [data-theme="dark"] .kpi-delta.down { background: rgba(10,147,150,.15); }
-
-    /* ── Main Grid: Chart + Panel ────────────────────────────────── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 3fr 2fr;
-      grid-template-rows: 540px;
-      gap: 16px;
-    }
-    @media (max-width: 900px) {
-      .main-grid { grid-template-columns: 1fr; grid-template-rows: 420px auto; }
-    }
-    @media (max-width: 500px) {
-      .main-grid { grid-template-rows: 340px auto; }
-      .section-title { font-size: 1.2rem; }
-      .section-subtitle { font-size: .7rem; }
-      .kpi-value { font-size: 1rem; }
-      .toggle-pill { padding: 3px 8px; font-size: .6rem; }
-      .range-btn { padding: 4px 10px; font-size: .6rem; }
-    }
-    @media (min-width: 1100px) {
-      .main-grid { grid-template-rows: 580px; }
-    }
-
-    /* ── Chart Card ──────────────────────────────────────────────── */
-    .chart-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
-    [data-theme="dark"] .chart-card {
-      background: #141414;
-      border-color: var(--dark-border);
-    }
-    .chart-controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
-
-    .toggle-pill {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border: 1.5px solid;
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      transition: all .2s;
-    }
-    .toggle-pill:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
-    }
-    .toggle-pill .line-prev {
-      width: 16px; height: 0;
-      border-top: 2.5px solid;
-      border-radius: 1px;
-    }
-    .toggle-pill .line-prev.dashed { border-top-style: dashed; }
-
-    .controls-right {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-    .controls-divider {
-      width: 1px;
-      height: 18px;
-      background: var(--border);
-    }
-    [data-theme="dark"] .controls-divider { background: var(--dark-border); }
-
-    .range-group { display: flex; gap: 4px; }
-    .range-btn {
-      padding: 4px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 7px;
-      background: transparent;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: var(--muted);
-      transition: all .2s;
-    }
-    [data-theme="dark"] .range-btn { border-color: var(--dark-border); color: #64748B; }
-    .range-btn:hover, .range-btn.active {
-      border-color: var(--populi);
-      color: var(--populi);
-    }
-    [data-theme="dark"] .range-btn:hover, [data-theme="dark"] .range-btn.active {
-      border-color: var(--populi-light);
-      color: var(--populi-light);
-    }
-
-    .chart-area {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .chart-source {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-      padding: 0 2px;
-    }
-    .chart-source-text {
-      font-size: 0.58rem;
-      color: var(--muted);
-      opacity: .6;
-    }
-    .chart-source-text a {
-      color: var(--populi);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .chart-source-text a:hover { text-decoration: underline; }
-
-    /* ── Panel ────────────────────────────────────────────────────── */
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    [data-theme="dark"] .panel {
-      background: #141414;
-      border-color: var(--dark-border);
-    }
-    .panel-header {
-      background: var(--navy);
-      padding: 8px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    [data-theme="dark"] .panel-header { background: var(--navy-light); }
-    .panel-header-title {
-      font-size: 0.56rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(255,255,255,.8);
-    }
-    .panel-header-date {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.56rem;
-      font-weight: 600;
-      color: var(--populi-light);
-      background: rgba(199,30,29,.15);
-      padding: 2px 8px;
-      border-radius: 5px;
-    }
-    .panel-body {
-      padding: 14px;
-      flex: 1;
-      overflow-y: auto;
-    }
-    .panel-block {
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    [data-theme="dark"] .panel-block { border-color: var(--dark-border); }
-    .panel-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .panel-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.58rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 2px;
-      padding: 2px 9px 2px 6px;
-      border-radius: 4px;
-      border-left: 3px solid;
-    }
-    .panel-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92rem;
-      font-weight: 700;
-      margin-bottom: 3px;
-    }
-    .panel-desc {
-      font-size: 0.66rem;
-      line-height: 1.55;
-      color: var(--slate-light);
-    }
-    [data-theme="dark"] .panel-desc { color: rgba(255,255,255,.45); }
-    .panel-desc strong { color: var(--navy); }
-    [data-theme="dark"] .panel-desc strong { color: #E2E8F0; }
-
-    .delta-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 0.82em;
-      white-space: nowrap;
-    }
-    .dt-blue   { background: rgba(0,95,115,.08);  color: #005F73; }
-    .dt-amber  { background: rgba(238,155,0,.08);  color: #EE9B00; }
-    .dt-teal   { background: rgba(10,147,150,.08);  color: #0A9396; }
-    .dt-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
-
-    /* ── Context Analysis ─────────────────────────────────────────── */
-    .ctx-box {
-      background: var(--cream);
-      border-radius: 6px;
-      padding: 8px 10px;
-      border-left: 3px solid var(--populi);
-      margin-top: 6px;
-    }
-    [data-theme="dark"] .ctx-box { background: var(--navy-light); }
-    .ctx-box p {
-      font-size: 0.66rem;
-      line-height: 1.55;
-      color: var(--slate-light);
-    }
-    [data-theme="dark"] .ctx-box p { color: #64748B; }
-    .ctx-box p strong { color: var(--navy); }
-    [data-theme="dark"] .ctx-box p strong { color: #E2E8F0; }
-
-    /* ── Edu Boxes ────────────────────────────────────────────────── */
-    .edu-box {
-      background: var(--cream);
-      border-radius: 8px;
-      padding: 10px 12px;
-      border-left: 3px solid var(--populi);
-      margin-top: 4px;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    [data-theme="dark"] .edu-box { background: var(--navy-light); }
-    .edu-box:hover { transform: translateY(-1px); }
-    .edu-box-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .edu-box-title {
-      font-size: 0.62rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--populi);
-    }
-    [data-theme="dark"] .edu-box-title { color: var(--populi-light); }
-    .edu-box-arrow {
-      font-size: 0.6rem;
-      color: var(--muted);
-      transition: transform .2s;
-    }
-    .edu-box.open .edu-box-arrow { transform: rotate(180deg); }
-    .edu-box-content {
-      display: none;
-      margin-top: 8px;
-    }
-    .edu-box.open .edu-box-content { display: block; }
-    .edu-box-content p {
-      font-size: 0.66rem;
-      line-height: 1.6;
-      color: var(--slate-light);
-      margin-bottom: 6px;
-    }
-    .edu-box-content p:last-child { margin-bottom: 0; }
-    [data-theme="dark"] .edu-box-content p { color: #64748B; }
-    .edu-box-content p strong { color: var(--navy); }
-    [data-theme="dark"] .edu-box-content p strong { color: #E2E8F0; }
-    .edu-box-content .highlight {
-      display: inline;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.92em;
-      font-weight: 600;
-      padding: 0 4px;
-      border-radius: 3px;
-    }
-    .hl-blue   { background: rgba(0,95,115,.08);  color: #005F73; }
-    .hl-amber  { background: rgba(238,155,0,.08);  color: #EE9B00; }
-    .hl-teal   { background: rgba(10,147,150,.08);  color: #0A9396; }
-    .hl-red    { background: rgba(199,30,29,.08);  color: #C71E1D; }
-
-    /* ── Ampliar Button ──────────────────────────────────────────── */
-    .panel-footer {
-      padding: 10px 14px;
-      border-top: 1px solid var(--border);
-    }
-    [data-theme="dark"] .panel-footer { border-color: var(--dark-border); }
-    .ampliar-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 8px 0;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--populi);
-      background: rgba(199,30,29,.06);
-      border: 1.5px solid rgba(199,30,29,.15);
-      transition: all .2s;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    [data-theme="dark"] .ampliar-btn {
-      background: rgba(232,112,107,.08);
-      border-color: rgba(232,112,107,.2);
-      color: var(--populi-light);
-    }
-    .ampliar-btn:hover {
-      background: rgba(199,30,29,.12);
-      border-color: rgba(199,30,29,.3);
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(199,30,29,.1);
-      text-decoration: none;
-    }
-    .ampliar-btn svg {
-      width: 13px; height: 13px;
-    }
-
-    /* ── Watermark ────────────────────────────────────────────────── */
-    .watermark {
-      height: 15px;
-      width: auto;
-      opacity: .18;
-    }
-    [data-theme="dark"] .watermark { opacity: .10; }
-
-    /* ── Loading ──────────────────────────────────────────────────── */
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      min-height: 400px;
-      color: var(--muted);
-    }
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--populi);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 0.75rem; }
-  </style>
+  <script src="comun/monitor.js"></script>
 </head>
 <body>
-  <div class="embed-container" id="app">
-    <div class="loading" id="loader">
-      <div class="spinner"></div>
-      <span class="loading-text">Cargando datos de precios productor y mayorista...</span>
+  <div class="wrap">
+    <div class="sec-hd">
+      <h2 class="sec-title"><span class="accent-bar"></span>Precios Productor y Mayorista</h2>
+      <p class="sec-sub" id="sub">IPP e IPM — Base 2016 = 100 · Serie mensual</p>
+    </div>
+
+    <div class="hz-bar">
+      <div class="hz-item"><span class="hz-lbl">Medida</span><div class="hz-grp" id="b-medida"></div></div>
+      <div class="hz-item"><span class="hz-lbl">Rango</span><div class="hz-grp" id="b-rango"></div></div>
+    </div>
+
+    <div class="kpi-grid" id="kpis"></div>
+
+    <div class="main-grid">
+      <div class="chart-card">
+        <div class="chart-ctrl"><div class="tog-grp" id="pastillas"></div></div>
+        <div class="grafico" id="chart"><div class="loading"><div class="spinner"></div><span>Cargando datos de precios productor y mayorista…</span></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><span class="panel-hd-t">Lectura del indicador</span><span class="panel-hd-d" id="panel-fecha"></span></div>
+        <div class="panel-body" id="panel"></div>
+        <div class="panel-ft">
+          <a href="../index.html" target="_blank" rel="noopener" class="amp">
+            <span>Ampliar análisis</span>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-grid" id="preguntas"></div>
+    <div class="source">
+      <span class="source-txt">Fuente: <a href="https://www.ine.gob.bo" target="_blank" rel="noopener">INE Bolivia</a> · Elaboración: <a href="https://populi.org.bo" target="_blank" rel="noopener">Centro de Estudios POPULI</a></span>
+      <svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" style="height:16px;width:auto;opacity:.18;flex-shrink:0" aria-hidden="true">
+        <text x="6" y="112" font-family="'Playfair Display',Georgia,serif" font-size="145" font-weight="700" fill="#C71E1D">P</text>
+        <text x="92" y="87" font-family="'Playfair Display',Georgia,serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" fill="currentColor">opuli</text>
+      </svg>
     </div>
   </div>
 
   <script>
-  (function() {
-    const BASE = 'https://centro-de-estudios-populi.github.io/populi-precios-productor/data/';
-    const DASHBOARD_URL = 'https://centro-de-estudios-populi.github.io/populi-precios-productor/';
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('theme') === 'dark') document.documentElement.dataset.theme = 'dark';
-
-    window.addEventListener('message', e => {
-      if (e.data && e.data.theme) document.documentElement.dataset.theme = e.data.theme;
-    });
-
-    function isDark() { return document.documentElement.dataset.theme === 'dark'; }
-    function fpct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
-    function fdate(f) {
-      const [y, m] = f.split('-');
-      const mn = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-      return mn[+m - 1] + ' ' + y;
-    }
-
-    const SERIES_CFG = [
-      { key: 'ipp',  label: 'IPP',          color: '#005F73', dashed: false },
-      { key: 'ipm',  label: 'IPM General',   color: '#EE9B00', dashed: false },
-      { key: 'nac',  label: 'IPM Nacional',   color: '#0A9396', dashed: true },
-      { key: 'imp',  label: 'IPM Importado',  color: '#C71E1D', dashed: true },
+  (function () {
+    var C = PM.C;
+    // En tema oscuro el IPP (petróleo) sube a menta: el petróleo queda bajo 3:1 contra la tarjeta
+    // oscura. Validado con todos los pares: daltonismo ΔE ≥ 15,4 y visión normal ≥ 19,7 en oscuro;
+    // 12,4 y 15,9 en claro.
+    var SERIES = [
+      { k: 'ipp', nombre: 'IPP', color: { claro: C.petroleo, oscuro: C.menta }, forma: 'linea', area: true },
+      { k: 'ipm', nombre: 'IPM General', color: C.oro, forma: 'linea' },
+      { k: 'nac', nombre: 'IPM Nacional', color: C.turquesa, forma: 'punteada' },
+      { k: 'imp', nombre: 'IPM Importado', color: C.rojo, forma: 'punteada' }
     ];
+    var COL = { ipp: SERIES[0].color, ipm: SERIES[1].color, nac: SERIES[2].color, imp: SERIES[3].color };
+    var DEC = { var_12_meses: 1, var_mensual: 2, var_acumulada: 1 };
+    var ROTULO = { ipp: 'IPP — Productor', ipm: 'IPM — General', nac: 'IPM — Nacional', imp: 'IPM — Importado' };
+    var DESC = {
+      ipp: 'Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
+      ipm: 'Variación de precios en el <strong>canal mayorista</strong>, incluyendo bienes nacionales e importados.',
+      nac: 'Componente de bienes de <strong>origen nacional</strong> del IPM. Refleja presiones internas de la cadena productiva.',
+      imp: 'Componente de bienes <strong>importados</strong> del IPM. Sensible al tipo de cambio paralelo y costos de internación.'
+    };
+    var estado = { vista: 'var_12_meses', rango: '2a', idx: null };
+    var activas = new Set(SERIES.map(function (s) { return s.k; }));
+    var D = {}, MAPA = {}, K = [], grafico;
+    var pct = function (v, dec) { return PM.pct(v, dec == null ? 1 : dec, true); };
 
-    const VIEWS = [
-      { key: 'var_12_meses', label: 'Interanual', fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%', isVar: true },
-      { key: 'var_mensual',  label: 'Mensual',    fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', isVar: true },
-      { key: 'var_acumulada', label: 'Acumulada',   fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%', yFmt: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%', isVar: true },
-    ];
+    PM.cargar(['ipp_general.json', 'ipm_origen.json', 'metadata.json']).then(function (r) {
+      var origen = {};
+      r[1].forEach(function (c) { origen[c.categoria] = c.series; });
+      D = { ipp: r[0], ipm: origen['GENERAL'] || [], nac: origen['ORIGEN NACIONAL'] || [], imp: origen['ORIGEN IMPORTADOS'] || [] };
+      Object.keys(D).forEach(function (k) { MAPA[k] = {}; D[k].forEach(function (x) { MAPA[k][x.fecha] = x; }); });
+      var meta = r[2];
+      if (meta.actualizado) document.getElementById('sub').textContent = 'IPP e IPM — Base 2016 = 100 · Serie mensual · Act. ' + PM.fecha(meta.actualizado.slice(0, 10));
+      PM.botonera(document.getElementById('b-medida'), [['var_12_meses', 'Interanual'], ['var_mensual', 'Mensual'], ['var_acumulada', 'Acumulada']],
+        estado.vista, function (v) { estado.vista = v; cifras(); grafico.redibujar(); panel(estado.idx); });
+      PM.botonera(document.getElementById('b-rango'), [['2a', '2 años'], ['5a', '5 años'], ['todo', 'Todo']],
+        estado.rango, function (v) { estado.rango = v; grafico.redibujar(); panel(null); });
+      PM.pastillas(document.getElementById('pastillas'),
+        SERIES.map(function (s) { return { k: s.k, nombre: s.nombre, color: s.color, forma: s.forma }; }),
+        activas, function () { grafico.redibujar(); panel(estado.idx); });
+      cifras();
+      var el = document.getElementById('chart');
+      el.innerHTML = '';
+      grafico = PM.montar(el, opciones);
+      grafico.chart.on('click', function (p) { if (p.dataIndex != null) panel(p.dataIndex); });
+      panel(null);
+      preguntas();
+      PM.alCambiarTema(function () { cifras(); panel(estado.idx); preguntas(); });
+    }).catch(function (e) { console.error(e); PM.error(document.getElementById('chart'), 'Error al cargar datos. Intente recargar.'); });
 
-    const RANGES = [
-      { label: '2A', meses: 24 },
-      { label: '5A', meses: 60 },
-      { label: 'Todo', meses: 0 },
-    ];
+    // Fechas de las series activas dentro del rango
+    function fechas() {
+      var set = {};
+      SERIES.forEach(function (s) { if (activas.has(s.k)) D[s.k].forEach(function (x) { set[x.fecha] = 1; }); });
+      var todas = Object.keys(set).sort();
+      return todas.slice(PM.desde(todas, estado.rango));
+    }
+    function valor(k, f, clave) { var x = f ? MAPA[k][f] : null; return x && x[clave] != null ? x[clave] : null; }
 
-    let ippData = [], ipmGen = [], ipmNac = [], ipmImp = [];
-    let active = new Set(SERIES_CFG.map(s => s.key));
-    let curView = 0, curRange = 0;
-    let chart = null, curIdx = -1;
-
-    async function init() {
-      let ippRaw, origenRaw, metaRaw;
-      try {
-        [ippRaw, origenRaw, metaRaw] = await Promise.all([
-          fetch(BASE + 'ipp_general.json').then(r => r.json()),
-          fetch(BASE + 'ipm_origen.json').then(r => r.json()),
-          fetch(BASE + 'metadata.json').then(r => r.json()),
-        ]);
-      } catch(e) {
-        document.getElementById('loader').innerHTML =
-          '<span class="loading-text" style="color:var(--ct-imp)">Error al cargar datos. Intente recargar.</span>';
-        return;
-      }
-
-      ippData = ippRaw;
-      const origenMap = {};
-      origenRaw.forEach(cat => { origenMap[cat.categoria] = cat.series; });
-      ipmGen = origenMap['GENERAL'] || [];
-      ipmNac = origenMap['ORIGEN NACIONAL'] || [];
-      ipmImp = origenMap['ORIGEN IMPORTADOS'] || [];
-
-      const allSeries = { ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp };
-
-      const app = document.getElementById('app');
-      app.innerHTML = buildHTML(metaRaw);
-
-      buildKPIs(allSeries);
-      buildToggles();
-      buildViews();
-      buildRanges();
-
-      chart = echarts.init(document.getElementById('chart'));
-      buildChart(allSeries);
-      updatePanel(allSeries, getLastCommonIdx(allSeries));
-
-      window.addEventListener('resize', () => chart && chart.resize());
-
-      new MutationObserver(() => {
-        buildChart(allSeries);
-        updatePanel(allSeries, curIdx);
-        buildKPIs(allSeries);
-      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    function cifras() {
+      var v = estado.vista, dec = DEC[v];
+      document.getElementById('kpis').innerHTML = SERIES.map(function (s) {
+        var a = D[s.k], u = a[a.length - 1] || {}, p = a[a.length - 2] || {};
+        var x = u[v], xp = p[v], d = (x != null && xp != null) ? x - xp : 0;
+        // minilínea de la misma medida que la cifra: últimos 24 meses; la acumulada, sólo el año en curso
+        var anio = (u.fecha || '').slice(0, 4);
+        var serie = v === 'var_acumulada'
+          ? a.filter(function (q) { return (q.fecha || '').slice(0, 4) === anio; }).map(function (q) { return q[v]; })
+          : PM.ultimos(a.map(function (q) { return q[v]; }), 24);
+        // en precios, subir es presión (malo) y bajar es alivio (bueno)
+        return PM.kpi({ color: s.color, rotulo: s.nombre, valor: x != null ? pct(x, dec) : '—',
+          delta: PM.flecha(d, 0.01) + ' ' + PM.num(Math.abs(d), 1) + ' pp', tono: Math.abs(d) < 0.01 ? 'neutro' : d > 0 ? 'malo' : 'bueno',
+          serie: serie });
+      }).join('');
     }
 
-    function buildHTML(meta) {
-      const dk = isDark();
-      const updTxt = meta.actualizado
-        ? new Date(meta.actualizado).toLocaleDateString('es-BO', { day:'numeric', month:'short', year:'numeric' })
-        : '';
-
-      return `
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="accent-bar"></span>
-            Precios Productor y Mayorista
-          </h2>
-          <p class="section-subtitle">IPP e IPM — Base 2016=100 · Serie mensual${updTxt ? ' · Act. ' + updTxt : ''}</p>
-        </div>
-
-        <div class="kpi-grid" id="kpis"></div>
-
-        <div class="main-grid">
-          <div class="chart-card">
-            <div class="chart-controls">
-              <div class="toggle-group" id="toggles"></div>
-              <div class="controls-right">
-                <div class="range-group" id="views"></div>
-                <div class="controls-divider"></div>
-                <div class="range-group" id="ranges"></div>
-              </div>
-            </div>
-            <div class="chart-area" id="chart"></div>
-            <div class="chart-source">
-              <span class="chart-source-text">
-                Fuente: <a href="https://www.ine.gob.bo" target="_blank">INE Bolivia</a> ·
-                Elaboración: <a href="https://populi.org.bo" target="_blank">Centro de Estudios POPULI</a>
-              </span>
-              <svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" class="watermark">
-                <text x="6" y="112" font-family="'Playfair Display', Georgia, serif" font-size="145" font-weight="700" fill="${dk ? '#E8706B' : '#C71E1D'}">P</text>
-                <text x="92" y="87" font-family="'Playfair Display', Georgia, serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" fill="${dk ? '#F5EFE0' : '#3D2B1F'}">opuli</text>
-              </svg>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-header-title">Lectura del indicador</span>
-              <span class="panel-header-date" id="panel-date"></span>
-            </div>
-            <div class="panel-body" id="panel-body"></div>
-            <div class="panel-footer">
-              <a href="${DASHBOARD_URL}" target="_blank" class="ampliar-btn">
-                <span>Ampliar análisis</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/>
-                  <line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; margin-top:16px;" id="edu-boxes"></div>
-      `;
-    }
-
-    function buildKPIs(allSeries) {
-      const view = VIEWS[curView];
-      const kpis = SERIES_CFG.map(s => {
-        const arr = allSeries[s.key];
-        const last = arr[arr.length - 1] || {};
-        const prev = arr[arr.length - 2] || {};
-        const val = last[view.key];
-        const prevVal = prev[view.key];
-        const d = (val != null && prevVal != null) ? val - prevVal : 0;
-        const cls = Math.abs(d) < 0.01 ? 'flat' : (d > 0 ? 'up' : 'down');
-        const arrow = cls === 'up' ? '&#9650;' : cls === 'down' ? '&#9660;' : '&#8212;';
-        return `<div class="kpi-card" data-s="${s.key === 'ipm' ? 'ipm' : s.key === 'nac' ? 'nac' : s.key === 'imp' ? 'imp' : 'ipp'}">
-          <div class="kpi-label">${s.label}</div>
-          <div class="kpi-value" style="color:${s.color}">${val != null ? view.fmt(val) : '—'}</div>
-          <div class="kpi-delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)} pp</div>
-        </div>`;
+    function opciones() {
+      K = fechas();
+      var v = estado.vista, dec = DEC[v], dk = PM.dk(), negativo = false, series = [];
+      SERIES.forEach(function (s) {
+        if (!activas.has(s.k)) return;
+        var data = K.map(function (f) { var x = valor(s.k, f, v); if (x != null && x < 0) negativo = true; return x; });
+        var n = -1;
+        for (var i = data.length - 1; i >= 0; i--) if (data[i] != null) { n = i; break; }
+        // protagonista el IPP (2,5 px y único relleno); las demás, 1,75 px. Trazo recto como el resto de
+        // los índices de precios. En «Acumulada» cada serie va cortada por año: vuelve a cero en enero.
+        var acum = v === 'var_acumulada';
+        var o = PM.linea(s.color, { ancho: s.k === 'ipp' ? 2.5 : 1.75, punteada: s.forma === 'punteada', extra: {
+          name: s.nombre, data: data, connectNulls: !acum, z: s.k === 'ipp' ? 4 : s.k === 'ipm' ? 3 : 2,
+          markPoint: n >= 0 ? PM.puntoFinal(s.color, n, data[n]) : undefined
+        } });
+        if (s.area) o.areaStyle = { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: PM.rgba(s.color, dk ? 0.16 : 0.10) }, { offset: 1, color: PM.rgba(s.color, 0) }]) };
+        if (acum) PM.porAnio(o, K).forEach(function (x) { series.push(x); });
+        else series.push(o);
       });
-      document.getElementById('kpis').innerHTML = kpis.join('');
-    }
-
-    function buildToggles() {
-      const el = document.getElementById('toggles');
-      SERIES_CFG.forEach(s => {
-        const btn = document.createElement('button');
-        btn.className = 'toggle-pill';
-        btn.dataset.key = s.key;
-        btn.innerHTML = `<span class="line-prev${s.dashed ? ' dashed' : ''}" style="border-color:#fff"></span>${s.label}`;
-        btn.addEventListener('click', () => {
-          if (active.has(s.key)) {
-            if (active.size === 1) return;
-            active.delete(s.key);
-          } else {
-            active.add(s.key);
-          }
-          syncPills();
-          rebuildAll();
-        });
-        el.appendChild(btn);
-      });
-      syncPills();
-    }
-
-    function syncPills() {
-      document.querySelectorAll('.toggle-pill').forEach(btn => {
-        const s = SERIES_CFG.find(x => x.key === btn.dataset.key);
-        const on = active.has(s.key);
-        btn.style.backgroundColor = on ? s.color : 'transparent';
-        btn.style.color = on ? '#fff' : s.color;
-        btn.style.borderColor = s.color;
-        const line = btn.querySelector('.line-prev');
-        if (line) line.style.borderColor = on ? '#fff' : s.color;
-      });
-    }
-
-    function buildViews() {
-      const el = document.getElementById('views');
-      VIEWS.forEach((v, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'range-btn' + (i === 0 ? ' active' : '');
-        btn.textContent = v.label;
-        btn.addEventListener('click', () => {
-          curView = i;
-          document.querySelectorAll('#views .range-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          rebuildAll();
-        });
-        el.appendChild(btn);
-      });
-    }
-
-    function buildRanges() {
-      const el = document.getElementById('ranges');
-      RANGES.forEach((r, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'range-btn' + (i === RANGES.length - 1 ? ' active' : '');
-        btn.textContent = r.label;
-        btn.addEventListener('click', () => {
-          curRange = i;
-          document.querySelectorAll('#ranges .range-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          rebuildAll();
-        });
-        el.appendChild(btn);
-      });
-    }
-
-    function rebuildAll() {
-      const allSeries = { ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp };
-      buildChart(allSeries);
-      buildKPIs(allSeries);
-      updatePanel(allSeries, curIdx);
-    }
-
-    function getLastCommonIdx(allSeries) {
-      const allDates = mergedDates(allSeries, 0);
-      return allDates.length - 1;
-    }
-
-    function mergedDates(allSeries, rangeIdx) {
-      const meses = RANGES[rangeIdx].meses;
-      const dateSet = new Set();
-      SERIES_CFG.forEach(s => {
-        if (!active.has(s.key)) return;
-        const arr = allSeries[s.key];
-        const sliced = meses > 0 ? arr.slice(-meses) : arr;
-        sliced.forEach(r => dateSet.add(r.fecha));
-      });
-      return [...dateSet].sort();
-    }
-
-    function buildChart(allSeries) {
-      const container = document.getElementById('chart');
-      if (!chart) chart = echarts.init(container);
-
-      const dk = isDark();
-      const view = VIEWS[curView];
-      const meses = RANGES[curRange].meses;
-      const dates = mergedDates(allSeries, curRange);
-      if (dates.length === 0) return;
-
-      const seriesEch = [];
-      const colors = [];
-
-      SERIES_CFG.forEach(s => {
-        if (!active.has(s.key)) return;
-        colors.push(s.color);
-        const arr = allSeries[s.key];
-        const map = Object.fromEntries(arr.map(r => [r.fecha, r]));
-        const vals = dates.map(f => map[f] ? map[f][view.key] : null);
-
-        const lastValid = vals.filter(v => v != null).pop();
-        const lastIdx = vals.lastIndexOf(lastValid);
-
-        seriesEch.push({
-          name: s.label,
-          type: 'line',
-          data: vals,
-          symbol: 'none',
-          smooth: 0.15,
-          lineStyle: { width: 2.5, type: s.dashed ? [6, 4] : 'solid' },
-          connectNulls: true,
-          areaStyle: (s.key === 'ipp' || s.key === 'ipm') ? {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: s.key === 'ipp'
-                ? (dk ? 'rgba(0,95,115,.2)' : 'rgba(0,95,115,.1)')
-                : (dk ? 'rgba(238,155,0,.15)' : 'rgba(238,155,0,.08)') },
-              { offset: 1, color: 'transparent' }
-            ])
-          } : undefined,
-          markPoint: lastIdx >= 0 ? {
-            data: [{ coord: [lastIdx, lastValid] }],
-            symbol: 'circle', symbolSize: 7,
-            itemStyle: { color: s.color, borderColor: dk ? '#141414' : '#fff', borderWidth: 2 },
-            label: { show: false }
-          } : undefined,
-          z: s.key === 'ipp' ? 4 : s.key === 'ipm' ? 3 : 2
-        });
-      });
-
-      if (view.isVar) {
-        seriesEch.push({
-          name: 'Ref 0%',
-          type: 'line',
-          data: dates.map(() => 0),
-          symbol: 'none',
-          lineStyle: { width: 1.5, color: dk ? '#475569' : '#E2DDD3', type: [5, 4] },
-          itemStyle: { color: dk ? '#475569' : '#E2DDD3' },
-          z: 1
-        });
-      }
-
-      const option = {
-        color: colors,
-        backgroundColor: 'transparent',
-        grid: { top: 30, right: 16, bottom: 44, left: 52 },
-        tooltip: {
-          trigger: 'axis',
-          backgroundColor: dk ? '#080808' : 'rgba(13,27,42,.96)',
-          borderColor: dk ? '#2A3A50' : '#1A2940',
-          textStyle: { fontFamily: 'Inter', fontSize: 12, color: '#fff' },
-          padding: [12, 16],
-          extraCssText: 'border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,.3);',
-          formatter: function(params) {
-            if (!params.length) return '';
-            const idx = params[0].dataIndex;
-            updatePanel({ ipp: ippData, ipm: ipmGen, nac: ipmNac, imp: ipmImp }, idx, dates);
-
-            let html = `<div style="font-weight:700; margin-bottom:6px; color:#E9D8A6; font-size:12px">${fdate(dates[idx])}</div>`;
-            params.forEach(p => {
-              if (p.value == null || p.seriesName === 'Ref 0%') return;
-              html += `<div style="display:flex; align-items:center; gap:8px; margin:3px 0">
-                <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>
-                <span style="flex:1;font-size:11px;color:rgba(255,255,255,.7)">${p.seriesName}</span>
-                <span style="font-family:'JetBrains Mono';font-weight:700;font-size:12px">${view.fmt(p.value)}</span>
-              </div>`;
-            });
-            return html;
-          }
-        },
-        xAxis: {
-          type: 'category',
-          data: dates,
-          axisLine: { lineStyle: { color: dk ? '#2A3A50' : '#E2DDD3' } },
-          axisTick: { show: false },
-          axisLabel: {
-            fontFamily: 'Inter',
-            fontSize: 10,
-            fontWeight: 500,
-            color: dk ? '#64748B' : '#64748B',
-            formatter: function(v, idx) {
-              const total = dates.length;
-              if (idx === 0 || idx === total - 1) return fdate(v);
-              const step = Math.max(1, Math.round(total / 8));
-              if (idx % step === 0) return fdate(v);
-              return '';
-            },
-            showMinLabel: true,
-            showMaxLabel: true,
-          }
-        },
-        yAxis: {
-          type: 'value',
-          splitLine: { lineStyle: { color: dk ? '#141414' : '#F1F5F9', type: 'dashed' } },
-          axisLine: { show: false },
-          axisTick: { show: false },
-          axisLabel: {
-            fontFamily: 'JetBrains Mono',
-            fontSize: 11,
-            color: dk ? '#64748B' : '#64748B',
-            formatter: v => view.yFmt(v)
-          }
-        },
-        series: seriesEch
+      if (negativo && series.length) series[0].markLine = PM.cero();
+      var el = document.getElementById('chart');
+      return {
+        grid: PM.grid({ top: 16 }),
+        xAxis: PM.ejeTiempo(K, el),
+        yAxis: PM.ejeY({ fmt: 'pct' }),
+        tooltip: PM.tooltip(function (ps) {
+          if (!ps.length) return '';
+          var i = ps[0].dataIndex;
+          panel(i);
+          var h = PM.ttTitulo(PM.fecha(K[i]));
+          ps.forEach(function (p) {
+            if (p.value == null) return;
+            var s = SERIES.filter(function (x) { return x.nombre === p.seriesName; })[0];
+            if (s) h += PM.ttFila(s.color, s.nombre, pct(p.value, dec), s.forma);
+          });
+          return h;
+        }),
+        series: series
       };
-
-      chart.setOption(option, true);
     }
 
-    function updatePanel(allSeries, dateIdx, datesArr) {
-      const view = VIEWS[curView];
-      let dates = datesArr;
-      if (!dates) {
-        dates = mergedDates(allSeries, curRange);
+    function panel(i) {
+      if (!K.length) return;
+      if (i == null || i < 0 || i >= K.length) {
+        // por defecto, el último mes con IPP e IPM publicados (el IPP suele llegar un mes después)
+        i = K.length - 1;
+        while (i > 0 && (valor('ipp', K[i], 'var_12_meses') == null || valor('ipm', K[i], 'var_12_meses') == null)) i--;
       }
-      if (dateIdx < 0 || dateIdx >= dates.length) dateIdx = dates.length - 1;
-      curIdx = dateIdx;
-      const fecha = dates[dateIdx];
-      const prevFecha = dateIdx > 0 ? dates[dateIdx - 1] : null;
-
-      document.getElementById('panel-date').textContent = fdate(fecha);
-
-      const getVal = (arr, f, key) => {
-        const r = arr.find(x => x.fecha === f);
-        return r ? r[key] : null;
-      };
-
-      const blocks = [];
-      const dtClasses = { ipp: 'dt-blue', ipm: 'dt-amber', nac: 'dt-teal', imp: 'dt-red' };
-      const bgAlpha  = { ipp: 'rgba(0,95,115,.08)', ipm: 'rgba(238,155,0,.08)', nac: 'rgba(10,147,150,.08)', imp: 'rgba(199,30,29,.08)' };
-      const labels   = { ipp: 'IPP — Productor', ipm: 'IPM — General', nac: 'IPM — Nacional', imp: 'IPM — Importado' };
-      const descs    = {
-        ipp: 'Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
-        ipm: 'Variación de precios en el <strong>canal mayorista</strong>, incluyendo bienes nacionales e importados.',
-        nac: 'Componente de bienes de <strong>origen nacional</strong> del IPM. Refleja presiones internas de la cadena productiva.',
-        imp: 'Componente de bienes <strong>importados</strong> del IPM. Sensible al tipo de cambio paralelo y costos de internación.'
-      };
-
-      SERIES_CFG.forEach(s => {
-        if (!active.has(s.key)) return;
-        const arr = allSeries[s.key];
-        const val = getVal(arr, fecha, view.key);
-        const prevVal = prevFecha ? getVal(arr, prevFecha, view.key) : null;
-        const delta = (val != null && prevVal != null) ? val - prevVal : null;
-
-        blocks.push(`
-          <div class="panel-block">
-            <div class="panel-label" style="color:${s.color}; background:${bgAlpha[s.key]}; border-left-color:${s.color}">${labels[s.key]}</div>
-            <div class="panel-val" style="color:${s.color}">${val != null ? view.fmt(val) : '—'}</div>
-            <p class="panel-desc">${descs[s.key]}${delta != null ? ` Cambio: <span class="delta-tag ${dtClasses[s.key]}">${(delta >= 0 ? '+' : '') + delta.toFixed(1)} pp</span>` : ''}</p>
-          </div>
-        `);
+      estado.idx = i;
+      var f = K[i], fa = i > 0 ? K[i - 1] : null, v = estado.vista, dec = DEC[v], mes = PM.fecha(f);
+      document.getElementById('panel-fecha').textContent = mes;
+      var html = '';
+      SERIES.forEach(function (s) {
+        if (!activas.has(s.k)) return;
+        var x = valor(s.k, f, v), xa = valor(s.k, fa, v), d = (x != null && xa != null) ? x - xa : null;
+        html += PM.pb(s.color, ROTULO[s.k], x != null ? pct(x, dec) : '—',
+          DESC[s.k] + (d != null ? ' Cambio: ' + PM.dt(s.color, PM.pp(d, 1)) : ''));
       });
-
-      const ippV = getVal(allSeries.ipp, fecha, 'var_12_meses');
-      const ipmV = getVal(allSeries.ipm, fecha, 'var_12_meses');
-      const nacV = getVal(allSeries.nac, fecha, 'var_12_meses');
-      const impV = getVal(allSeries.imp, fecha, 'var_12_meses');
-
-      let analysis = '';
-      if (view.key === 'var_12_meses' && ippV != null && ipmV != null) {
-        const maxV = Math.max(ippV, ipmV);
-        const diff = Math.abs(ippV - ipmV).toFixed(1);
-        const impNacDiff = (impV != null && nacV != null) ? (impV - nacV).toFixed(1) : null;
-
-        if (maxV > 20) {
-          analysis = `<strong>Presiones inflacionarias severas en la cadena productiva.</strong> IPP en <span class="delta-tag dt-blue">${fpct(ippV)}</span> e IPM en <span class="delta-tag dt-amber">${fpct(ipmV)}</span> — la brecha de ${diff} pp indica ${ippV > ipmV ? 'que el canal mayorista absorbe parte del impacto' : 'que los costos de distribución e importación amplifican las presiones'}.${impNacDiff ? ` La diferencia importado-nacional de <span class="delta-tag dt-red">${impNacDiff} pp</span> refleja ${impV > nacV ? 'el peso del tipo de cambio paralelo sobre insumos importados' : 'que las presiones son mayormente de origen interno'}.` : ''}`;
-        } else if (maxV > 10) {
-          analysis = `<strong>Presiones significativas en precios de producción y distribución.</strong> Con el IPP en <span class="delta-tag dt-blue">${fpct(ippV)}</span> y el IPM en <span class="delta-tag dt-amber">${fpct(ipmV)}</span>, la diferencia de ${diff} pp sugiere ${ippV > ipmV ? 'que los intermediarios absorben parte del alza' : 'presiones adicionales en la distribución mayorista'}.`;
-        } else if (maxV > 4) {
-          analysis = `<strong>Presiones moderadas en la cadena de precios.</strong> IPP (+${ippV.toFixed(1)}%) e IPM (+${ipmV.toFixed(1)}%) muestran variaciones por encima del rango de estabilidad. La brecha de ${diff} pp indica ${ippV > ipmV ? 'absorción parcial por intermediarios' : 'márgenes de distribución que amplifican el alza'}.`;
-        } else {
-          analysis = `<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en ${fpct(ippV)} e IPM en ${fpct(ipmV)} sugieren presiones contenidas a lo largo de la cadena de precios.`;
+      var ippV = valor('ipp', f, 'var_12_meses'), ipmV = valor('ipm', f, 'var_12_meses');
+      var nacV = valor('nac', f, 'var_12_meses'), impV = valor('imp', f, 'var_12_meses');
+      var sinDato = 'Datos no disponibles para este período.', txt = sinDato;
+      if (v === 'var_12_meses' && ippV != null && ipmV != null) {
+        var maxV = Math.max(ippV, ipmV), brecha = PM.num(Math.abs(ippV - ipmV), 1) + ' pp';
+        var impNac = (impV != null && nacV != null) ? PM.num(impV - nacV, 1) + ' pp' : null;
+        var tIpp = PM.dt(COL.ipp, pct(ippV)), tIpm = PM.dt(COL.ipm, pct(ipmV));
+        if (maxV > 20) txt = '<strong>Presiones inflacionarias severas en la cadena productiva.</strong> IPP en ' + tIpp + ' e IPM en ' + tIpm +
+          ' — la brecha de ' + brecha + ' indica ' + (ippV > ipmV ? 'que el canal mayorista absorbe parte del impacto' : 'que los costos de distribución e importación amplifican las presiones') + '.' +
+          (impNac ? ' La diferencia importado-nacional de ' + PM.dt(COL.imp, impNac) + ' refleja ' + (impV > nacV ? 'el peso del tipo de cambio paralelo sobre insumos importados' : 'que las presiones son mayormente de origen interno') + '.' : '');
+        else if (maxV > 10) txt = '<strong>Presiones significativas en precios de producción y distribución.</strong> Con el IPP en ' + tIpp + ' y el IPM en ' + tIpm +
+          ', la diferencia de ' + brecha + ' sugiere ' + (ippV > ipmV ? 'que los intermediarios absorben parte del alza' : 'presiones adicionales en la distribución mayorista') + '.';
+        else if (maxV > 4) txt = '<strong>Presiones moderadas en la cadena de precios.</strong> IPP (' + pct(ippV) + ') e IPM (' + pct(ipmV) +
+          ') muestran variaciones por encima del rango de estabilidad. La brecha de ' + brecha + ' indica ' + (ippV > ipmV ? 'absorción parcial por intermediarios' : 'márgenes de distribución que amplifican el alza') + '.';
+        else txt = '<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en ' + pct(ippV) + ' e IPM en ' + pct(ipmV) +
+          ' sugieren presiones contenidas a lo largo de la cadena de precios.';
+      } else if (v === 'var_mensual') {
+        var m = [valor('ipp', f, 'var_mensual'), valor('ipm', f, 'var_mensual')].filter(function (x) { return x != null; });
+        if (m.length) {
+          var maxM = Math.max.apply(null, m);
+          txt = maxM > 1 ? 'Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>' + mes + '</strong>.'
+            : maxM > 0 ? 'Variación mensual positiva moderada en <strong>' + mes + '</strong>. Las presiones se acumulan mes a mes en la cadena de precios.'
+            : 'Variación mensual negativa en <strong>' + mes + '</strong> — alivio temporal en costos, posiblemente estacional.';
         }
-      } else if (view.key === 'var_mensual') {
-        const vals = [ippV, ipmV].filter(v => v != null);
-        if (vals.length) {
-          const maxM = Math.max(...[getVal(allSeries.ipp, fecha, 'var_mensual'), getVal(allSeries.ipm, fecha, 'var_mensual')].filter(v => v != null));
-          analysis = maxM > 1
-            ? `Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>${fdate(fecha)}</strong>.`
-            : maxM > 0
-            ? `Variación mensual positiva moderada en <strong>${fdate(fecha)}</strong>. Las presiones se acumulan mes a mes en la cadena de precios.`
-            : `Variación mensual negativa en <strong>${fdate(fecha)}</strong> — alivio temporal en costos, posiblemente estacional.`;
-        } else {
-          analysis = 'Datos no disponibles para este período.';
-        }
-      } else if (view.key === 'var_acumulada') {
-        const ippAcum = getVal(allSeries.ipp, fecha, 'var_acumulada');
-        const ipmAcum = getVal(allSeries.ipm, fecha, 'var_acumulada');
-        if (ippAcum != null && ipmAcum != null) {
-          const maxA = Math.max(ippAcum, ipmAcum);
-          analysis = maxA > 10
-            ? `<strong>Acumulado elevado para lo que va del año.</strong> IPP en <span class="delta-tag dt-blue">${fpct(ippAcum)}</span> e IPM en <span class="delta-tag dt-amber">${fpct(ipmAcum)}</span> — a este ritmo, la inflación anual en la cadena productiva será significativa.`
-            : maxA > 3
-            ? `<strong>Acumulado moderado.</strong> IPP <span class="delta-tag dt-blue">${fpct(ippAcum)}</span> e IPM <span class="delta-tag dt-amber">${fpct(ipmAcum)}</span> desde enero — las presiones se van sumando a lo largo del año.`
-            : `Variación acumulada contenida: IPP en ${fpct(ippAcum)} e IPM en ${fpct(ipmAcum)} desde enero. Presiones limitadas en lo que va del año.`;
-        } else {
-          analysis = 'Seleccione un punto del gráfico para ver el análisis.';
+      } else if (v === 'var_acumulada') {
+        var ia = valor('ipp', f, 'var_acumulada'), ma = valor('ipm', f, 'var_acumulada');
+        if (ia != null && ma != null) {
+          var maxA = Math.max(ia, ma), tIa = PM.dt(COL.ipp, pct(ia)), tMa = PM.dt(COL.ipm, pct(ma));
+          txt = maxA > 10 ? '<strong>Acumulado elevado para lo que va del año.</strong> IPP en ' + tIa + ' e IPM en ' + tMa + ' — a este ritmo, la inflación anual en la cadena productiva será significativa.'
+            : maxA > 3 ? '<strong>Acumulado moderado.</strong> IPP ' + tIa + ' e IPM ' + tMa + ' desde enero — las presiones se van sumando a lo largo del año.'
+            : 'Variación acumulada contenida: IPP en ' + pct(ia) + ' e IPM en ' + pct(ma) + ' desde enero. Presiones limitadas en lo que va del año.';
         }
       }
-
-      document.getElementById('panel-body').innerHTML = blocks.join('') +
-        `<div class="ctx-box"><p>${analysis}</p></div>`;
+      document.getElementById('panel').innerHTML = html + PM.ctx(txt);
     }
 
-    function buildEduBoxes() {
-      const lastIPP = ippData[ippData.length - 1] || {};
-      const lastIPM = ipmGen[ipmGen.length - 1] || {};
-      const lastNac = ipmNac[ipmNac.length - 1] || {};
-      const lastImp = ipmImp[ipmImp.length - 1] || {};
-
-      const eduData = [
-        {
-          title: '¿Qué son el IPP y el IPM?',
-          content: `<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>
-          <p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>`
-        },
-        {
-          title: '¿Cómo se relacionan IPP, IPM e IPC?',
-          content: `<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>
-          <p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución.</p>`
-        },
-        {
-          title: 'IPM Nacional vs. Importado',
-          content: `<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria, los bienes importados reflejan el tipo de cambio paralelo, no el oficial. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>
-          <p>Actualmente el componente importado registra <span class="highlight hl-red">${lastImp.var_12_meses != null ? fpct(lastImp.var_12_meses) : '—'}</span> interanual vs. <span class="highlight hl-teal">${lastNac.var_12_meses != null ? fpct(lastNac.var_12_meses) : '—'}</span> del nacional — ${lastImp.var_12_meses > lastNac.var_12_meses ? 'la presión cambiaria encarece significativamente los bienes importados' : 'las presiones son mayormente de origen interno'}.</p>`
-        },
-        {
-          title: '¿Qué significa base 2016=100?',
-          content: `<p>Ambos índices usan <strong>2016 como año base</strong> (=100). Esto significa que un índice de <span class="highlight hl-blue">${lastIPP.indice != null ? lastIPP.indice.toFixed(0) : '—'}</span> indica que los precios al productor han subido <strong>${lastIPP.indice != null ? (lastIPP.indice - 100).toFixed(0) : '—'}%</strong> desde 2016. La metodología es <strong>Laspeyres</strong>, que mide el cambio de precios manteniendo fija la canasta de productos del año base.</p>
-          <p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>`
-        }
-      ];
-
-      document.getElementById('edu-boxes').innerHTML = eduData.map(e => `
-        <div class="edu-box" onclick="this.classList.toggle('open')">
-          <div class="edu-box-toggle">
-            <span class="edu-box-title">${e.title}</span>
-            <span class="edu-box-arrow">&#9660;</span>
-          </div>
-          <div class="edu-box-content">${e.content}</div>
-        </div>
-      `).join('');
+    // Preguntas con cifras vivas. Se rehacen con el tema (los colores de las cifras cambian)
+    // y conservan las que el lector tenía abiertas.
+    function preguntas() {
+      var el = document.getElementById('preguntas');
+      var abiertas = [].map.call(el.querySelectorAll('.edu'), function (e) { return e.classList.contains('open'); });
+      var u = function (k) { var a = D[k]; return a[a.length - 1] || {}; };
+      var lIpp = u('ipp'), lNac = u('nac'), lImp = u('imp');
+      PM.preguntas(el, [
+        ['¿Qué son el IPP y el IPM?', '<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>' +
+          '<p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>'],
+        ['¿Cómo se relacionan IPP, IPM e IPC?', '<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>' +
+          '<p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución.</p>'],
+        ['IPM Nacional vs. Importado', '<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria, los bienes importados reflejan el tipo de cambio paralelo, no el oficial. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>' +
+          '<p>Actualmente el componente importado registra ' + PM.dt(COL.imp, lImp.var_12_meses != null ? pct(lImp.var_12_meses) : '—') + ' interanual vs. ' +
+          PM.dt(COL.nac, lNac.var_12_meses != null ? pct(lNac.var_12_meses) : '—') + ' del nacional — ' +
+          (lImp.var_12_meses > lNac.var_12_meses ? 'la presión cambiaria encarece significativamente los bienes importados' : 'las presiones son mayormente de origen interno') + '.</p>'],
+        ['¿Qué significa base 2016 = 100?', '<p>Ambos índices usan <strong>2016 como año base</strong> (= 100). Esto significa que un índice de ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
+          ' indica que los precios al productor han subido <strong>' + (lIpp.indice != null ? PM.num(lIpp.indice - 100, 0) : '—') + '%</strong> desde 2016. La metodología es <strong>Laspeyres</strong>, que mide el cambio de precios manteniendo fija la canasta de productos del año base.</p>' +
+          '<p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>']
+      ]);
+      abiertas.forEach(function (a, i) {
+        var e = el.children[i];
+        if (a && e) { e.classList.add('open'); e.querySelector('.edu-t').setAttribute('aria-expanded', 'true'); }
+      });
     }
-
-    init().then(() => buildEduBoxes());
   })();
   </script>
 </body>
