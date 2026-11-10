@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IPP e IPM · Populi</title>
+  <title data-en="PPI and WPI · Populi">IPP e IPM · Populi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -14,13 +14,13 @@
 <body>
   <div class="wrap">
     <div class="sec-hd">
-      <h2 class="sec-title"><span class="accent-bar"></span>Precios Productor y Mayorista</h2>
-      <p class="sec-sub" id="sub">IPP e IPM — Base 2016 = 100 · Serie mensual</p>
+      <h2 class="sec-title" data-en='<span class="accent-bar"></span>Producer and Wholesale Prices'><span class="accent-bar"></span>Precios Productor y Mayorista</h2>
+      <p class="sec-sub" id="sub" data-en="PPI and WPI — Base 2016 = 100 · Monthly series">IPP e IPM — Base 2016 = 100 · Serie mensual</p>
     </div>
 
     <div class="hz-bar">
-      <div class="hz-item"><span class="hz-lbl">Medida</span><div class="hz-grp" id="b-medida"></div></div>
-      <div class="hz-item"><span class="hz-lbl">Rango</span><div class="hz-grp" id="b-rango"></div></div>
+      <div class="hz-item"><span class="hz-lbl" data-en="Measure">Medida</span><div class="hz-grp" id="b-medida"></div></div>
+      <div class="hz-item"><span class="hz-lbl" data-en="Range">Rango</span><div class="hz-grp" id="b-rango"></div></div>
     </div>
 
     <div class="kpi-grid" id="kpis"></div>
@@ -28,14 +28,14 @@
     <div class="main-grid">
       <div class="chart-card">
         <div class="chart-ctrl"><div class="tog-grp" id="pastillas"></div></div>
-        <div class="grafico" id="chart"><div class="loading"><div class="spinner"></div><span>Cargando datos de precios productor y mayorista…</span></div></div>
+        <div class="grafico" id="chart"><div class="loading"><div class="spinner"></div><span data-en="Loading producer and wholesale price data…">Cargando datos de precios productor y mayorista…</span></div></div>
       </div>
       <div class="panel">
-        <div class="panel-hd"><span class="panel-hd-t">Lectura del indicador</span><span class="panel-hd-d" id="panel-fecha"></span></div>
+        <div class="panel-hd"><span class="panel-hd-t" data-en="Reading the indicator">Lectura del indicador</span><span class="panel-hd-d" id="panel-fecha"></span></div>
         <div class="panel-body" id="panel"></div>
         <div class="panel-ft">
           <a href="../index.html" target="_blank" rel="noopener" class="amp">
-            <span>Ampliar análisis</span>
+            <span data-en="Expand analysis">Ampliar análisis</span>
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </a>
         </div>
@@ -44,7 +44,7 @@
 
     <div class="edu-grid" id="preguntas"></div>
     <div class="source">
-      <span class="source-txt">Fuente: <a href="https://www.ine.gob.bo" target="_blank" rel="noopener">INE Bolivia</a> · Elaboración: <a href="https://populi.org.bo" target="_blank" rel="noopener">Centro de Estudios POPULI</a></span>
+      <span class="source-txt" data-en='Source: <a href="https://www.ine.gob.bo" target="_blank" rel="noopener">INE Bolivia</a> · Analysis: <a href="https://populi.org.bo" target="_blank" rel="noopener">Centro de Estudios POPULI</a>'>Fuente: <a href="https://www.ine.gob.bo" target="_blank" rel="noopener">INE Bolivia</a> · Elaboración: <a href="https://populi.org.bo" target="_blank" rel="noopener">Centro de Estudios POPULI</a></span>
       <svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" style="height:16px;width:auto;opacity:.18;flex-shrink:0" aria-hidden="true">
         <text x="6" y="112" font-family="'Playfair Display',Georgia,serif" font-size="145" font-weight="700" fill="#C71E1D">P</text>
         <text x="92" y="87" font-family="'Playfair Display',Georgia,serif" font-size="55" font-weight="400" font-style="italic" letter-spacing="1" fill="currentColor">opuli</text>
@@ -54,24 +54,28 @@
 
   <script>
   (function () {
-    var C = PM.C;
+    var C = PM.C, T = PM.t;   // T('castellano', 'inglés'): con ?lang=en el gráfico sale en inglés
     // En tema oscuro el IPP (petróleo) sube a menta: el petróleo queda bajo 3:1 contra la tarjeta
     // oscura. Validado con todos los pares: daltonismo ΔE ≥ 15,4 y visión normal ≥ 19,7 en oscuro;
     // 12,4 y 15,9 en claro.
     var SERIES = [
-      { k: 'ipp', nombre: 'IPP', color: { claro: C.petroleo, oscuro: C.menta }, forma: 'linea', area: true },
-      { k: 'ipm', nombre: 'IPM General', color: C.oro, forma: 'linea' },
-      { k: 'nac', nombre: 'IPM Nacional', color: C.turquesa, forma: 'punteada' },
-      { k: 'imp', nombre: 'IPM Importado', color: C.rojo, forma: 'punteada' }
+      { k: 'ipp', nombre: T('IPP', 'PPI'), color: { claro: C.petroleo, oscuro: C.menta }, forma: 'linea', area: true },
+      { k: 'ipm', nombre: T('IPM General', 'General WPI'), color: C.oro, forma: 'linea' },
+      { k: 'nac', nombre: T('IPM Nacional', 'Domestic WPI'), color: C.turquesa, forma: 'punteada' },
+      { k: 'imp', nombre: T('IPM Importado', 'Imported WPI'), color: C.rojo, forma: 'punteada' }
     ];
     var COL = { ipp: SERIES[0].color, ipm: SERIES[1].color, nac: SERIES[2].color, imp: SERIES[3].color };
     var DEC = { var_12_meses: 1, var_mensual: 2, var_acumulada: 1 };
-    var ROTULO = { ipp: 'IPP — Productor', ipm: 'IPM — General', nac: 'IPM — Nacional', imp: 'IPM — Importado' };
+    var ROTULO = { ipp: T('IPP — Productor', 'PPI — Producer'), ipm: T('IPM — General', 'WPI — General'), nac: T('IPM — Nacional', 'WPI — Domestic'), imp: T('IPM — Importado', 'WPI — Imported') };
     var DESC = {
-      ipp: 'Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
-      ipm: 'Variación de precios en el <strong>canal mayorista</strong>, incluyendo bienes nacionales e importados.',
-      nac: 'Componente de bienes de <strong>origen nacional</strong> del IPM. Refleja presiones internas de la cadena productiva.',
-      imp: 'Componente de bienes <strong>importados</strong> del IPM. Sensible al tipo de cambio paralelo y costos de internación.'
+      ipp: T('Variación de precios a la <strong>salida de producción</strong> (fábricas, campos, minas). Primer eslabón de la cadena de precios.',
+        'Change in prices at the <strong>point of production</strong> (factories, farms, mines). First link in the price chain.'),
+      ipm: T('Variación de precios en el <strong>canal mayorista</strong>, incluyendo bienes nacionales e importados.',
+        'Change in prices in the <strong>wholesale channel</strong>, including domestic and imported goods.'),
+      nac: T('Componente de bienes de <strong>origen nacional</strong> del IPM. Refleja presiones internas de la cadena productiva.',
+        'Component of the WPI for goods of <strong>domestic origin</strong>. It reflects internal pressures in the production chain.'),
+      imp: T('Componente de bienes <strong>importados</strong> del IPM. Sensible al tipo de cambio paralelo y costos de internación.',
+        'Component of the WPI for <strong>imported</strong> goods. Sensitive to the parallel exchange rate and import costs.')
     };
     var estado = { vista: 'var_12_meses', rango: '2a', idx: null };
     var activas = new Set(SERIES.map(function (s) { return s.k; }));
@@ -84,10 +88,11 @@
       D = { ipp: r[0], ipm: origen['GENERAL'] || [], nac: origen['ORIGEN NACIONAL'] || [], imp: origen['ORIGEN IMPORTADOS'] || [] };
       Object.keys(D).forEach(function (k) { MAPA[k] = {}; D[k].forEach(function (x) { MAPA[k][x.fecha] = x; }); });
       var meta = r[2];
-      if (meta.actualizado) document.getElementById('sub').textContent = 'IPP e IPM — Base 2016 = 100 · Serie mensual · Act. ' + PM.fecha(meta.actualizado.slice(0, 10));
-      PM.botonera(document.getElementById('b-medida'), [['var_12_meses', 'Interanual'], ['var_mensual', 'Mensual'], ['var_acumulada', 'Acumulada']],
+      if (meta.actualizado) document.getElementById('sub').textContent = T('IPP e IPM — Base 2016 = 100 · Serie mensual · Act. ' + PM.fecha(meta.actualizado.slice(0, 10)),
+        'PPI and WPI — Base 2016 = 100 · Monthly series · Updated ' + PM.fecha(meta.actualizado.slice(0, 10)));
+      PM.botonera(document.getElementById('b-medida'), [['var_12_meses', T('Interanual', 'Year-on-year')], ['var_mensual', T('Mensual', 'Monthly')], ['var_acumulada', T('Acumulada', 'Year-to-date')]],
         estado.vista, function (v) { estado.vista = v; cifras(); grafico.redibujar(); panel(estado.idx); });
-      PM.botonera(document.getElementById('b-rango'), [['2a', '2 años'], ['5a', '5 años'], ['todo', 'Todo']],
+      PM.botonera(document.getElementById('b-rango'), [['2a', T('2 años', '2 years')], ['5a', T('5 años', '5 years')], ['todo', T('Todo', 'All')]],
         estado.rango, function (v) { estado.rango = v; grafico.redibujar(); panel(null); });
       PM.pastillas(document.getElementById('pastillas'),
         SERIES.map(function (s) { return { k: s.k, nombre: s.nombre, color: s.color, forma: s.forma }; }),
@@ -100,7 +105,7 @@
       panel(null);
       preguntas();
       PM.alCambiarTema(function () { cifras(); panel(estado.idx); preguntas(); });
-    }).catch(function (e) { console.error(e); PM.error(document.getElementById('chart'), 'Error al cargar datos. Intente recargar.'); });
+    }).catch(function (e) { console.error(e); PM.error(document.getElementById('chart'), T('Error al cargar datos. Intente recargar.', 'Error loading data. Please try reloading.')); });
 
     // Fechas de las series activas dentro del rango
     function fechas() {
@@ -185,39 +190,54 @@
         if (!activas.has(s.k)) return;
         var x = valor(s.k, f, v), xa = valor(s.k, fa, v), d = (x != null && xa != null) ? x - xa : null;
         html += PM.pb(s.color, ROTULO[s.k], x != null ? pct(x, dec) : '—',
-          DESC[s.k] + (d != null ? ' Cambio: ' + PM.dt(s.color, PM.pp(d, 1)) : ''));
+          DESC[s.k] + (d != null ? T(' Cambio: ', ' Change: ') + PM.dt(s.color, PM.pp(d, 1)) : ''));
       });
       var ippV = valor('ipp', f, 'var_12_meses'), ipmV = valor('ipm', f, 'var_12_meses');
       var nacV = valor('nac', f, 'var_12_meses'), impV = valor('imp', f, 'var_12_meses');
-      var sinDato = 'Datos no disponibles para este período.', txt = sinDato;
+      var sinDato = T('Datos no disponibles para este período.', 'Data not available for this period.'), txt = sinDato;
       if (v === 'var_12_meses' && ippV != null && ipmV != null) {
         var maxV = Math.max(ippV, ipmV), brecha = PM.num(Math.abs(ippV - ipmV), 1) + ' pp';
         var impNac = (impV != null && nacV != null) ? PM.num(impV - nacV, 1) + ' pp' : null;
         var tIpp = PM.dt(COL.ipp, pct(ippV)), tIpm = PM.dt(COL.ipm, pct(ipmV));
-        if (maxV > 20) txt = '<strong>Presiones inflacionarias severas en la cadena productiva.</strong> IPP en ' + tIpp + ' e IPM en ' + tIpm +
+        if (maxV > 20) txt = T('<strong>Presiones inflacionarias severas en la cadena productiva.</strong> IPP en ' + tIpp + ' e IPM en ' + tIpm +
           ' — la brecha de ' + brecha + ' indica ' + (ippV > ipmV ? 'que el canal mayorista absorbe parte del impacto' : 'que los costos de distribución e importación amplifican las presiones') + '.' +
-          (impNac ? ' La diferencia importado-nacional de ' + PM.dt(COL.imp, impNac) + ' refleja ' + (impV > nacV ? 'el peso del tipo de cambio paralelo sobre insumos importados' : 'que las presiones son mayormente de origen interno') + '.' : '');
-        else if (maxV > 10) txt = '<strong>Presiones significativas en precios de producción y distribución.</strong> Con el IPP en ' + tIpp + ' y el IPM en ' + tIpm +
-          ', la diferencia de ' + brecha + ' sugiere ' + (ippV > ipmV ? 'que los intermediarios absorben parte del alza' : 'presiones adicionales en la distribución mayorista') + '.';
-        else if (maxV > 4) txt = '<strong>Presiones moderadas en la cadena de precios.</strong> IPP (' + pct(ippV) + ') e IPM (' + pct(ipmV) +
-          ') muestran variaciones por encima del rango de estabilidad. La brecha de ' + brecha + ' indica ' + (ippV > ipmV ? 'absorción parcial por intermediarios' : 'márgenes de distribución que amplifican el alza') + '.';
-        else txt = '<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en ' + pct(ippV) + ' e IPM en ' + pct(ipmV) +
-          ' sugieren presiones contenidas a lo largo de la cadena de precios.';
+          (impNac ? ' La diferencia importado-nacional de ' + PM.dt(COL.imp, impNac) + ' refleja ' + (impV > nacV ? 'el peso del tipo de cambio paralelo sobre insumos importados' : 'que las presiones son mayormente de origen interno') + '.' : ''),
+          '<strong>Severe inflationary pressures in the production chain.</strong> PPI at ' + tIpp + ' and WPI at ' + tIpm +
+          ' — the gap of ' + brecha + ' indicates ' + (ippV > ipmV ? 'that the wholesale channel absorbs part of the impact' : 'that distribution and import costs amplify the pressures') + '.' +
+          (impNac ? ' The imported-domestic difference of ' + PM.dt(COL.imp, impNac) + ' reflects ' + (impV > nacV ? 'the weight of the parallel exchange rate on imported inputs' : 'that the pressures are mostly of domestic origin') + '.' : ''));
+        else if (maxV > 10) txt = T('<strong>Presiones significativas en precios de producción y distribución.</strong> Con el IPP en ' + tIpp + ' y el IPM en ' + tIpm +
+          ', la diferencia de ' + brecha + ' sugiere ' + (ippV > ipmV ? 'que los intermediarios absorben parte del alza' : 'presiones adicionales en la distribución mayorista') + '.',
+          '<strong>Significant pressures on production and distribution prices.</strong> With the PPI at ' + tIpp + ' and the WPI at ' + tIpm +
+          ', the difference of ' + brecha + ' suggests ' + (ippV > ipmV ? 'that intermediaries absorb part of the increase' : 'additional pressures in wholesale distribution') + '.');
+        else if (maxV > 4) txt = T('<strong>Presiones moderadas en la cadena de precios.</strong> IPP (' + pct(ippV) + ') e IPM (' + pct(ipmV) +
+          ') muestran variaciones por encima del rango de estabilidad. La brecha de ' + brecha + ' indica ' + (ippV > ipmV ? 'absorción parcial por intermediarios' : 'márgenes de distribución que amplifican el alza') + '.',
+          '<strong>Moderate pressures in the price chain.</strong> PPI (' + pct(ippV) + ') and WPI (' + pct(ipmV) +
+          ') show changes above the stability range. The gap of ' + brecha + ' indicates ' + (ippV > ipmV ? 'partial absorption by intermediaries' : 'distribution margins that amplify the increase') + '.');
+        else txt = T('<strong>Estabilidad relativa en precios productores y mayoristas.</strong> IPP en ' + pct(ippV) + ' e IPM en ' + pct(ipmV) +
+          ' sugieren presiones contenidas a lo largo de la cadena de precios.',
+          '<strong>Relative stability in producer and wholesale prices.</strong> PPI at ' + pct(ippV) + ' and WPI at ' + pct(ipmV) +
+          ' suggest contained pressures along the price chain.');
       } else if (v === 'var_mensual') {
         var m = [valor('ipp', f, 'var_mensual'), valor('ipm', f, 'var_mensual')].filter(function (x) { return x != null; });
         if (m.length) {
           var maxM = Math.max.apply(null, m);
-          txt = maxM > 1 ? 'Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>' + mes + '</strong>.'
-            : maxM > 0 ? 'Variación mensual positiva moderada en <strong>' + mes + '</strong>. Las presiones se acumulan mes a mes en la cadena de precios.'
-            : 'Variación mensual negativa en <strong>' + mes + '</strong> — alivio temporal en costos, posiblemente estacional.';
+          txt = maxM > 1 ? T('Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>' + mes + '</strong>.',
+              'Monthly change above 1% — it indicates a one-off <strong>price shock</strong> in the production chain for <strong>' + mes + '</strong>.')
+            : maxM > 0 ? T('Variación mensual positiva moderada en <strong>' + mes + '</strong>. Las presiones se acumulan mes a mes en la cadena de precios.',
+              'Moderate positive monthly change in <strong>' + mes + '</strong>. Pressures build up month by month in the price chain.')
+            : T('Variación mensual negativa en <strong>' + mes + '</strong> — alivio temporal en costos, posiblemente estacional.',
+              'Negative monthly change in <strong>' + mes + '</strong> — temporary relief in costs, possibly seasonal.');
         }
       } else if (v === 'var_acumulada') {
         var ia = valor('ipp', f, 'var_acumulada'), ma = valor('ipm', f, 'var_acumulada');
         if (ia != null && ma != null) {
           var maxA = Math.max(ia, ma), tIa = PM.dt(COL.ipp, pct(ia)), tMa = PM.dt(COL.ipm, pct(ma));
-          txt = maxA > 10 ? '<strong>Acumulado elevado para lo que va del año.</strong> IPP en ' + tIa + ' e IPM en ' + tMa + ' — a este ritmo, la inflación anual en la cadena productiva será significativa.'
-            : maxA > 3 ? '<strong>Acumulado moderado.</strong> IPP ' + tIa + ' e IPM ' + tMa + ' desde enero — las presiones se van sumando a lo largo del año.'
-            : 'Variación acumulada contenida: IPP en ' + pct(ia) + ' e IPM en ' + pct(ma) + ' desde enero. Presiones limitadas en lo que va del año.';
+          txt = maxA > 10 ? T('<strong>Acumulado elevado para lo que va del año.</strong> IPP en ' + tIa + ' e IPM en ' + tMa + ' — a este ritmo, la inflación anual en la cadena productiva será significativa.',
+              '<strong>High year-to-date change for this point in the year.</strong> PPI at ' + tIa + ' and WPI at ' + tMa + ' — at this pace, annual inflation in the production chain will be significant.')
+            : maxA > 3 ? T('<strong>Acumulado moderado.</strong> IPP ' + tIa + ' e IPM ' + tMa + ' desde enero — las presiones se van sumando a lo largo del año.',
+              '<strong>Moderate year-to-date change.</strong> PPI ' + tIa + ' and WPI ' + tMa + ' since January — pressures keep adding up over the year.')
+            : T('Variación acumulada contenida: IPP en ' + pct(ia) + ' e IPM en ' + pct(ma) + ' desde enero. Presiones limitadas en lo que va del año.',
+              'Contained year-to-date change: PPI at ' + pct(ia) + ' and WPI at ' + pct(ma) + ' since January. Limited pressures so far this year.');
         }
       }
       document.getElementById('panel').innerHTML = html + PM.ctx(txt);
@@ -231,17 +251,28 @@
       var u = function (k) { var a = D[k]; return a[a.length - 1] || {}; };
       var lIpp = u('ipp'), lNac = u('nac'), lImp = u('imp');
       PM.preguntas(el, [
-        ['¿Qué son el IPP y el IPM?', '<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>' +
-          '<p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>'],
-        ['¿Cómo se relacionan IPP, IPM e IPC?', '<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>' +
-          '<p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución.</p>'],
-        ['IPM Nacional vs. Importado', '<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria, los bienes importados reflejan el tipo de cambio paralelo, no el oficial. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>' +
+        [T('¿Qué son el IPP y el IPM?', 'What are the PPI and the WPI?'), T('<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>' +
+          '<p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>',
+          '<p>The <strong>Producer Price Index (PPI)</strong> measures the change in prices at the point of production — factory, farm, mine. It is the first link in the price chain: when it rises, it anticipates pressures that will eventually reach the consumer.</p>' +
+          '<p>The <strong>Wholesale Price Index (WPI)</strong> measures prices in the wholesale channel, where goods pass from the producer or importer to the retailer. It includes both goods of <strong>domestic origin</strong> and <strong>imported</strong> goods, which makes it sensitive to changes in the exchange rate.</p>')],
+        [T('¿Cómo se relacionan IPP, IPM e IPC?', 'How are the PPI, the WPI and the CPI related?'), T('<p>Los tres índices miden precios en diferentes etapas de la cadena: <strong>IPP → IPM → IPC</strong> (productor → mayorista → consumidor). Las presiones de precios suelen nacer en el IPP, transmitirse al IPM con semanas de rezago, y finalmente llegar al IPC.</p>' +
+          '<p>Cuando el IPP sube más que el IPM, los intermediarios absorben parte del costo. Cuando el IPM sube más que el IPP, la brecha cambiaria encarece los <strong>insumos importados</strong>, añadiendo presión en la etapa de distribución.</p>',
+          '<p>The three indices measure prices at different stages of the chain: <strong>PPI → WPI → CPI</strong> (producer → wholesaler → consumer). Price pressures usually originate in the PPI, pass through to the WPI with a lag of weeks, and finally reach the CPI.</p>' +
+          '<p>When the PPI rises more than the WPI, intermediaries absorb part of the cost. When the WPI rises more than the PPI, the exchange-rate gap makes <strong>imported inputs</strong> more expensive, adding pressure at the distribution stage.</p>')],
+        [T('IPM Nacional vs. Importado', 'Domestic vs. Imported WPI'), T('<p>El IPM distingue entre bienes de <strong>origen nacional</strong> e <strong>importados</strong>. En un contexto de brecha cambiaria, los bienes importados reflejan el tipo de cambio paralelo, no el oficial. Esto genera una <strong>inflación importada</strong> que se amplifica cuando el boliviano se deprecia de facto.</p>' +
           '<p>Actualmente el componente importado registra ' + PM.dt(COL.imp, lImp.var_12_meses != null ? pct(lImp.var_12_meses) : '—') + ' interanual vs. ' +
           PM.dt(COL.nac, lNac.var_12_meses != null ? pct(lNac.var_12_meses) : '—') + ' del nacional — ' +
-          (lImp.var_12_meses > lNac.var_12_meses ? 'la presión cambiaria encarece significativamente los bienes importados' : 'las presiones son mayormente de origen interno') + '.</p>'],
-        ['¿Qué significa base 2016 = 100?', '<p>Ambos índices usan <strong>2016 como año base</strong> (= 100). Esto significa que un índice de ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
+          (lImp.var_12_meses > lNac.var_12_meses ? 'la presión cambiaria encarece significativamente los bienes importados' : 'las presiones son mayormente de origen interno') + '.</p>',
+          '<p>The WPI distinguishes between goods of <strong>domestic origin</strong> and <strong>imported</strong> goods. In a context of an exchange-rate gap, imported goods reflect the parallel exchange rate, not the official one. This generates <strong>imported inflation</strong> that is amplified when the boliviano depreciates de facto.</p>' +
+          '<p>The imported component currently stands at ' + PM.dt(COL.imp, lImp.var_12_meses != null ? pct(lImp.var_12_meses) : '—') + ' year-on-year vs. ' +
+          PM.dt(COL.nac, lNac.var_12_meses != null ? pct(lNac.var_12_meses) : '—') + ' for the domestic component — ' +
+          (lImp.var_12_meses > lNac.var_12_meses ? 'exchange-rate pressure makes imported goods significantly more expensive' : 'the pressures are mostly of domestic origin') + '.</p>')],
+        [T('¿Qué significa base 2016 = 100?', 'What does base 2016 = 100 mean?'), T('<p>Ambos índices usan <strong>2016 como año base</strong> (= 100). Esto significa que un índice de ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
           ' indica que los precios al productor han subido <strong>' + (lIpp.indice != null ? PM.num(lIpp.indice - 100, 0) : '—') + '%</strong> desde 2016. La metodología es <strong>Laspeyres</strong>, que mide el cambio de precios manteniendo fija la canasta de productos del año base.</p>' +
-          '<p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>']
+          '<p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>',
+          '<p>Both indices use <strong>2016 as the base year</strong> (= 100). This means that an index of ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
+          ' indicates that producer prices have risen <strong>' + (lIpp.indice != null ? PM.num(lIpp.indice - 100, 0) : '—') + '%</strong> since 2016. The methodology is <strong>Laspeyres</strong>, which measures the change in prices while keeping the base-year basket of products fixed.</p>' +
+          '<p>The PPI covers <strong>223 products</strong> in 6 groups (agriculture, mining, manufacturing, electricity, water, construction), while the WPI covers the wholesale distribution channel, distinguishing by origin.</p>')]
       ]);
       abiertas.forEach(function (a, i) {
         var e = el.children[i];
