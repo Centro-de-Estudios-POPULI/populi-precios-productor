@@ -79,7 +79,17 @@
     };
     var estado = { vista: 'var_12_meses', rango: '2a', idx: null };
     var activas = new Set(SERIES.map(function (s) { return s.k; }));
-    var D = {}, MAPA = {}, K = [], grafico;
+    var D = {}, MAPA = {}, K = [], META = {}, grafico;
+    // Grupos del IPP tal como vienen en metadata.json (`ipp.grupos`) → cómo se escriben en la frase de las preguntas.
+    // El dato trae «Agricolas» sin tilde: se corrige al mostrar. Un grupo que no esté acá sale como viene, en minúscula.
+    var GRUPO = {
+      'Servicios': T('servicios', 'services'),
+      'Industria Manufacturera': T('industria manufacturera', 'manufacturing'),
+      'Otros Minerales y Gas Natural': T('otros minerales y gas natural', 'other minerals and natural gas'),
+      'Agricolas': T('agrícolas', 'agriculture'),
+      'Pecuaria': T('pecuaria', 'livestock'),
+      'Pesca': T('pesca', 'fishing')
+    };
     var pct = function (v, dec) { return PM.pct(v, dec == null ? 1 : dec, true); };
 
     PM.cargar(['ipp_general.json', 'ipm_origen.json', 'metadata.json']).then(function (r) {
@@ -88,6 +98,7 @@
       D = { ipp: r[0], ipm: origen['GENERAL'] || [], nac: origen['ORIGEN NACIONAL'] || [], imp: origen['ORIGEN IMPORTADOS'] || [] };
       Object.keys(D).forEach(function (k) { MAPA[k] = {}; D[k].forEach(function (x) { MAPA[k][x.fecha] = x; }); });
       var meta = r[2];
+      META = meta;             // las preguntas leen de acá los productos y los grupos del IPP
       if (meta.actualizado) document.getElementById('sub').textContent = T('IPP e IPM — Base 2016 = 100 · Serie mensual · Act. ' + PM.fecha(meta.actualizado.slice(0, 10)),
         'PPI and WPI — Base 2016 = 100 · Monthly series · Updated ' + PM.fecha(meta.actualizado.slice(0, 10)));
       PM.botonera(document.getElementById('b-medida'), [['var_12_meses', T('Interanual', 'Year-on-year')], ['var_mensual', T('Mensual', 'Monthly')], ['var_acumulada', T('Acumulada', 'Year-to-date')]],
@@ -220,11 +231,14 @@
       } else if (v === 'var_mensual') {
         var m = [valor('ipp', f, 'var_mensual'), valor('ipm', f, 'var_mensual')].filter(function (x) { return x != null; });
         if (m.length) {
-          var maxM = Math.max.apply(null, m);
+          var maxM = Math.max.apply(null, m), minM = Math.min.apply(null, m);
+          // Sin variación: IPP e IPM en cero a los decimales con que se muestra la mensual («0,00%»). No es «negativa».
+          var medio = 0.5 * Math.pow(10, -DEC.var_mensual), sinVar = Math.abs(maxM) < medio && Math.abs(minM) < medio;
           txt = maxM > 1 ? T('Variación mensual superior al 1% — indica un <strong>shock de precios</strong> puntual en la cadena productiva para <strong>' + mes + '</strong>.',
               'Monthly change above 1% — it indicates a one-off <strong>price shock</strong> in the production chain for <strong>' + mes + '</strong>.')
             : maxM > 0 ? T('Variación mensual positiva moderada en <strong>' + mes + '</strong>. Las presiones se acumulan mes a mes en la cadena de precios.',
               'Moderate positive monthly change in <strong>' + mes + '</strong>. Pressures build up month by month in the price chain.')
+            : sinVar ? T('Sin variación mensual en <strong>' + mes + '</strong>.', 'No monthly change in <strong>' + mes + '</strong>.')
             : T('Variación mensual negativa en <strong>' + mes + '</strong> — alivio temporal en costos, posiblemente estacional.',
               'Negative monthly change in <strong>' + mes + '</strong> — temporary relief in costs, possibly seasonal.');
         }
@@ -250,6 +264,10 @@
       var abiertas = [].map.call(el.querySelectorAll('.edu'), function (e) { return e.classList.contains('open'); });
       var u = function (k) { var a = D[k]; return a[a.length - 1] || {}; };
       var lIpp = u('ipp'), lNac = u('nac'), lImp = u('imp');
+      // Productos y grupos del IPP: salen de metadata.json (`ipp.productos`, `ipp.grupos`), no se escriben a mano
+      var mIpp = (META && META.ipp) || {}, grupos = Object.keys(mIpp.grupos || {}).map(function (g) { return GRUPO[g] || g.toLowerCase(); });
+      var listaG = grupos.length > 1 ? grupos.slice(0, -1).join(', ') + T(' y ', ' and ') + grupos[grupos.length - 1] : grupos.join('');
+      var nProd = mIpp.productos != null ? PM.num(mIpp.productos, 0) : '—';
       PM.preguntas(el, [
         [T('¿Qué son el IPP y el IPM?', 'What are the PPI and the WPI?'), T('<p>El <strong>Índice de Precios Productor (IPP)</strong> mide la variación de precios a la salida del lugar de producción — fábrica, campo, mina. Es el primer eslabón de la cadena de precios: cuando sube, anticipa presiones que eventualmente llegarán al consumidor.</p>' +
           '<p>El <strong>Índice de Precios al Por Mayor (IPM)</strong> mide los precios en el canal mayorista, donde los bienes pasan del productor o importador al minorista. Incluye tanto bienes de <strong>origen nacional</strong> como <strong>importados</strong>, lo que lo hace sensible a las variaciones del tipo de cambio.</p>',
@@ -269,10 +287,10 @@
           (lImp.var_12_meses > lNac.var_12_meses ? 'exchange-rate pressure makes imported goods significantly more expensive' : 'the pressures are mostly of domestic origin') + '.</p>')],
         [T('¿Qué significa base 2016 = 100?', 'What does base 2016 = 100 mean?'), T('<p>Ambos índices usan <strong>2016 como año base</strong> (= 100). Esto significa que un índice de ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
           ' indica que los precios al productor han subido <strong>' + (lIpp.indice != null ? PM.num(lIpp.indice - 100, 0) : '—') + '%</strong> desde 2016. La metodología es <strong>Laspeyres</strong>, que mide el cambio de precios manteniendo fija la canasta de productos del año base.</p>' +
-          '<p>El IPP cubre <strong>223 productos</strong> en 6 grupos (agricultura, minería, manufactura, electricidad, agua, construcción), mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>',
+          '<p>El IPP cubre <strong>' + nProd + ' productos</strong>' + (grupos.length ? ' en ' + grupos.length + ' grupos (' + listaG + ')' : '') + ', mientras que el IPM cubre el canal de distribución mayorista con distinción por origen.</p>',
           '<p>Both indices use <strong>2016 as the base year</strong> (= 100). This means that an index of ' + PM.dt(COL.ipp, lIpp.indice != null ? PM.num(lIpp.indice, 0) : '—') +
           ' indicates that producer prices have risen <strong>' + (lIpp.indice != null ? PM.num(lIpp.indice - 100, 0) : '—') + '%</strong> since 2016. The methodology is <strong>Laspeyres</strong>, which measures the change in prices while keeping the base-year basket of products fixed.</p>' +
-          '<p>The PPI covers <strong>223 products</strong> in 6 groups (agriculture, mining, manufacturing, electricity, water, construction), while the WPI covers the wholesale distribution channel, distinguishing by origin.</p>')]
+          '<p>The PPI covers <strong>' + nProd + ' products</strong>' + (grupos.length ? ' in ' + grupos.length + ' groups (' + listaG + ')' : '') + ', while the WPI covers the wholesale distribution channel, distinguishing by origin.</p>')]
       ]);
       abiertas.forEach(function (a, i) {
         var e = el.children[i];
